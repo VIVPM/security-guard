@@ -26,7 +26,7 @@ const NotificationsPage = () => {
 
     useEffect(() => {
         axios
-            .get('http://localhost:5000/apiNotifications', {
+            .get('https://security-guard.onrender.com/apiNotifications', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => {
@@ -35,7 +35,7 @@ const NotificationsPage = () => {
                     // Wait 5 seconds before marking notifications as read
                     setTimeout(() => {
                         axios.put(
-                            'http://localhost:5000/apiNotifications/read',
+                            'https://security-guard.onrender.com/apiNotifications/read',
                             {},
                             {
                                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },

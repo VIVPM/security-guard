@@ -198,7 +198,7 @@ const Report = () => {
         const fetchGuards = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:5000/admin/guards', {
+                const response = await axios.get('https://security-guard.onrender.com/admin/guards', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 // Filter for guards with backgroundCheck status "Accepted"
@@ -230,7 +230,7 @@ const Report = () => {
                 if (filterEndDate) params.append('endDate', filterEndDate);
                 queryParams = '?' + params.toString();
             }
-            const response = await axios.get(`http://localhost:5000/apiReports/guard/${selectedGuard}${queryParams}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/apiReports/guard/${selectedGuard}${queryParams}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setReportData(response.data);
@@ -342,7 +342,7 @@ const Report = () => {
         try {
             const token = localStorage.getItem('token');
             const profileRes = await axios.get(
-                `http://localhost:5000/admin/guard/${selectedGuard}`,
+                `https://security-guard.onrender.com/admin/guard/${selectedGuard}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const user = profileRes.data;
@@ -630,7 +630,7 @@ const Report = () => {
     const openAdminAnalyticsDialog = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/apiReports/all', {
+            const response = await axios.get('https://security-guard.onrender.com/apiReports/all', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAdminAnalyticsData(response.data);

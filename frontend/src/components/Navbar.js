@@ -77,7 +77,7 @@ const Navbar = () => {
         if (auth.token) {
             const fetchUnreadCount = () => {
                 axios
-                    .get('http://localhost:5000/apiNotifications', {
+                    .get('https://security-guard.onrender.com/apiNotifications', {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                     })
                     .then((res) => {

@@ -98,7 +98,7 @@ const GuardDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`http://localhost:5000/apiProfile/guard${qs}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/apiProfile/guard${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setPlaces(response.data);

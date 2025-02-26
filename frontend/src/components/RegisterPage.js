@@ -170,7 +170,7 @@ const RegisterPage = () => {
             data.append('trainingAndSkills', JSON.stringify(formData.trainingAndSkills));
             data.append('emergencyContact', JSON.stringify(formData.emergencyContact));
 
-            await axios.post('http://localhost:5000/apiAuth/register', data, {
+            await axios.post('https://security-guard.onrender.com/apiAuth/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

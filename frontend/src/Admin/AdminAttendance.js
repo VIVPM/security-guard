@@ -32,7 +32,7 @@ const AdminAttendance = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:5000/apiAttendance/date?date=${selectedDate}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/apiAttendance/date?date=${selectedDate}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAttendanceData(response.data);
@@ -53,7 +53,7 @@ const AdminAttendance = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                'http://localhost:5000/apiAttendance/send-email',
+                'https://security-guard.onrender.com/apiAttendance/send-email',
                 { guardId, date: selectedDate },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

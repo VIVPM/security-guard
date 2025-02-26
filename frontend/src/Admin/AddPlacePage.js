@@ -105,7 +105,7 @@ const AddPlacePage = () => {
     // Fetch guards with accepted background check status
     const fetchGuards = () => {
         axios
-            .get('http://localhost:5000/admin/guards/accepted', {
+            .get('https://security-guard.onrender.com/admin/guards/accepted', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => setGuards(res.data))
@@ -129,7 +129,7 @@ const AddPlacePage = () => {
         try {
             setLoading(true);
             const queryString = buildQueryString();
-            const res = await axios.get(`http://localhost:5000/apiPlaces/places${queryString}`, {
+            const res = await axios.get(`https://security-guard.onrender.com/apiPlaces/places${queryString}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setPlaces(res.data);
@@ -201,7 +201,7 @@ const AddPlacePage = () => {
             data.append('placePhoto', file);
         }
         try {
-            await axios.post('http://localhost:5000/apiPlaces/places', data, {
+            await axios.post('https://security-guard.onrender.com/apiPlaces/places', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -268,7 +268,7 @@ const AddPlacePage = () => {
             if (updateFile) {
                 data.append('placePhoto', updateFile);
             }
-            await axios.put(`http://localhost:5000/apiPlaces/places/${selectedPlace._id}`, data, {
+            await axios.put(`https://security-guard.onrender.com/apiPlaces/places/${selectedPlace._id}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Place updated successfully!', severity: 'success' });
@@ -286,7 +286,7 @@ const AddPlacePage = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`http://localhost:5000/apiPlaces/places/${placeToDelete._id}`, {
+            await axios.delete(`https://security-guard.onrender.com/apiPlaces/places/${placeToDelete._id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Place deleted successfully!', severity: 'success' });
@@ -302,7 +302,7 @@ const AddPlacePage = () => {
     // --- Track Person Handler using Leaflet ---
     const handleTrack = async (guardId, guardName) => {
         try {
-            const response = await axios.get(`http://localhost:5000/apiAttendance/admin?guardId=${guardId}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/apiAttendance/admin?guardId=${guardId}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             const attendanceDocs = response.data;

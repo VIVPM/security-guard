@@ -54,7 +54,7 @@ const ProfilePage = () => {
     // Fetch current profile on mount
     useEffect(() => {
         axios
-            .get('http://localhost:5000/apiProfile/profile', {
+            .get('https://security-guard.onrender.com/apiProfile/profile', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => {
@@ -173,7 +173,7 @@ const ProfilePage = () => {
         data.append('emergencyContact', JSON.stringify(formData.emergencyContact));
         // Note: Background check is not editable in this form.
         try {
-            await axios.put('http://localhost:5000/apiProfile/profile', data, {
+            await axios.put('https://security-guard.onrender.com/apiProfile/profile', data, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'multipart/form-data',

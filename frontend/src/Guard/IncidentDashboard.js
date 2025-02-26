@@ -118,7 +118,7 @@ const IncidentDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`http://localhost:5000/apiIncidents/incidents${qs}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/apiIncidents/incidents${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setIncidents(response.data);
@@ -155,7 +155,7 @@ const IncidentDashboard = () => {
         createVideoFiles.forEach((file) => data.append('videos', file));
 
         try {
-            await axios.post('http://localhost:5000/apiIncidents/incidents', data, {
+            await axios.post('https://security-guard.onrender.com/apiIncidents/incidents', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -201,7 +201,7 @@ const IncidentDashboard = () => {
         updateVideoFiles.forEach((file) => data.append('videos', file));
 
         try {
-            await axios.put(`http://localhost:5000/apiIncidents/incidents/${selectedIncident._id}`, data, {
+            await axios.put(`https://security-guard.onrender.com/apiIncidents/incidents/${selectedIncident._id}`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -225,7 +225,7 @@ const IncidentDashboard = () => {
     const handleDeleteIncident = async () => {
         setLoading(true);
         try {
-            await axios.delete(`http://localhost:5000/apiIncidents/incidents/${selectedIncident._id}`, {
+            await axios.delete(`https://security-guard.onrender.com/apiIncidents/incidents/${selectedIncident._id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Incident deleted successfully!', severity: 'success' });

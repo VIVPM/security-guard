@@ -87,7 +87,7 @@ const AdminIncidentDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`http://localhost:5000/admin/incidents${qs}`, {
+            const response = await axios.get(`https://security-guard.onrender.com/admin/incidents${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setIncidents(response.data);
@@ -117,7 +117,7 @@ const AdminIncidentDashboard = () => {
     const handleUpdateStatus = async () => {
         try {
             await axios.put(
-                `http://localhost:5000/admin/incidents/${selectedIncident._id}/status`,
+                `https://security-guard.onrender.com/admin/incidents/${selectedIncident._id}/status`,
                 { status: updateStatus },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
