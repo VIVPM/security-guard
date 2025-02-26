@@ -56,5 +56,4 @@ app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
-exports.api = functions.https.onRequest(app);
 app.listen(port, () => console.log(`Server running on port ${port}`));
