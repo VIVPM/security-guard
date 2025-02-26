@@ -44,6 +44,6 @@
   },
   "proxy": [
     "http://localhost:3000",
-    "https://security-guard.onrender.com"
+    "https://security-guard-jsj0.onrender.com"
   ]
 }

@@ -63,7 +63,7 @@ const AttendanceDashboard = () => {
         const fetchPlaces = async () => {
             setLoading(true);
             try {
-                const res = await axios.get('https://security-guard.onrender.com/apiProfile/guard', {
+                const res = await axios.get('https://security-guard-jsj0.onrender.com/apiProfile/guard', {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 setPlaces(res.data);
@@ -94,7 +94,7 @@ const AttendanceDashboard = () => {
         try {
             const coords = await getCurrentPosition();
             const res = await axios.post(
-                'https://security-guard.onrender.com/apiAttendance/clock-in',
+                'https://security-guard-jsj0.onrender.com/apiAttendance/clock-in',
                 {
                     placeId: place._id,
                     latitude: coords.latitude,
@@ -124,7 +124,7 @@ const AttendanceDashboard = () => {
         try {
             const coords = await getCurrentPosition();
             const res = await axios.post(
-                'https://security-guard.onrender.com/apiAttendance/clock-out',
+                'https://security-guard-jsj0.onrender.com/apiAttendance/clock-out',
                 {
                     placeId: place._id,
                     latitude: coords.latitude,

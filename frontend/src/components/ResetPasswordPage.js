@@ -69,7 +69,7 @@ const ResetPasswordPage = () => {
         }
         setLoading(true);
         try {
-            const res = await axios.post('https://security-guard.onrender.com/apiAuth/reset-password', {
+            const res = await axios.post('https://security-guard-jsj0.onrender.com/apiAuth/reset-password', {
                 token,
                 password,
                 confirmPassword,
