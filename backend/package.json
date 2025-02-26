@@ -1,0 +1,49 @@
+{
+  "name": "job-portal-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "NODE_ENV=production nodemon server.js",
+    "build": "yarn install"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cloudinary": "^2.5.1",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^3.2.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.1",
+    "firebase-tools": "^13.9.0",
+    "html-pdf": "^3.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "8.3.4",
+    "mongoose-type-email": "^1.1.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "pdfkit": "^0.16.0",
+    "socket.io": "^4.8.1",
+    "uuid": "^8.3.2"
+  },
+  "proxy": [
+    "http://localhost:3000",
+    "https://security-guard.onrender.com"
+  ]
+}
