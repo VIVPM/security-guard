@@ -23,6 +23,15 @@ function getDistanceFromLatLonInKMeters(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
+function formatTime(date) {
+    return date.toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+
 // POST /api/attendance/clock-in
 // Allow clock-in only when a scheduled place is assigned for today.
 // In routes/attendance.js

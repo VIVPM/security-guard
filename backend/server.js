@@ -17,7 +17,7 @@ const notificationRoutes = require('./routes/notifications');
 const locationsRouter = require('./routes/locations');
 const reportRouter = require('./routes/reports');
 const attendanceRouter = require('./routes/attendances');
-// require('./routes/scheduler');
+require('./routes/scheduler');
 
 const app = express();
 const port = process.env.PORT || 5000;
