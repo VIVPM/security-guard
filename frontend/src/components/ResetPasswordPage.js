@@ -134,6 +134,10 @@ const ResetPasswordPage = () => {
                 autoHideDuration={4000}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                sx={{
+                    top: '75% !important',
+                    transform: 'translateY(-50%)',
+                }}
             >
                 <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

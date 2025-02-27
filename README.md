@@ -61,21 +61,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/m
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-
-### Create New Dockerfile
-
-![Screenshot 2024-02-16 185609](https://github.com/VIVPM/tourist-guide-website/assets/116868237/d947f6c8-a287-426d-b5fa-cf1fe5221b6a)
-
-
-### `Docker Deployment`
-
-<ol>
-  <li> <h4>docker build -t react-image</h4>
-  </li>
-  <li>
-    <h4>docker run -p 8000:8000 react-image</h4>
-  </li>
-</ol>
