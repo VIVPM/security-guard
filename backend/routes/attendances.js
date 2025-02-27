@@ -61,7 +61,7 @@ router.post('/clock-in', auth, async (req, res) => {
             assignedPlace.latitude,
             assignedPlace.longitude
         );
-        const allowedDistance = 1000; // allowed threshold in kilometers
+        const allowedDistance = 1; // allowed threshold in kilometers
         console.log(distance);
         if (distance > allowedDistance) {
             return res.status(400).json({
