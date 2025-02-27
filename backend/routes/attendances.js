@@ -157,6 +157,7 @@ router.post('/clock-out', auth, async (req, res) => {
 
         // Ensure current time is at or after shift end.
         const now = new Date();
+        console.log(formatTime(shiftEnd));
         if (now < shiftEnd) {
             return res.status(400).json({ message: `You cannot check out before ${formatTime(shiftEnd)}` });
         }
