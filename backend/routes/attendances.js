@@ -155,12 +155,15 @@ router.post('/clock-out', auth, async (req, res) => {
         const shiftEnd = new Date(todayStart);
         shiftEnd.setHours(Number(endHour), Number(endMinute), 0, 0);
 
-        // Ensure current time is at or after shift end.
-        const now = new Date();
-        console.log(formatTime(shiftEnd));
-        if (now < shiftEnd) {
+        // Convert current time to IST
+        const nowIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+        console.log(formatTime(shiftEnd)); // For debugging
+
+        // Ensure current time in IST is at or after shift end.
+        if (nowIST < shiftEnd) {
             return res.status(400).json({ message: `You cannot check out before ${formatTime(shiftEnd)}` });
         }
+
 
         // Update attendance record with check-out details.
         record.checkOutTime = new Date();
