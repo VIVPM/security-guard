@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
+import apiList from './apiList';
 
 const LoginPage = () => {
     const history = useHistory();
@@ -43,7 +44,7 @@ const LoginPage = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('https://security-guard-jsj0.onrender.com/apiAuth/login', { email, password });
+            const res = await axios.post(apiList.login, { email, password });
             // Save token via context
             login(res.data.token);
             console.log(res);
@@ -57,7 +58,7 @@ const LoginPage = () => {
             //             (position) => {
             //                 const { latitude, longitude } = position.coords;
             //                 console.log('Coordinates:', latitude, longitude);
-            //                 axios.post('https://security-guard-jsj0.onrender.com/apiLocations', { latitude, longitude }, {
+            //                 axios.post('http://localhost:5000/apiLocations', { latitude, longitude }, {
             //                     headers: { Authorization: `Bearer ${res.data.token}` }
             //                 })
             //                     .catch(err => console.error('Location update error:', err));
@@ -91,7 +92,7 @@ const LoginPage = () => {
 
     const handleForgotSubmit = async () => {
         try {
-            await axios.post('https://security-guard-jsj0.onrender.com/apiAuth/forgot-password', { email: forgotEmail });
+            await axios.post(apiList.forgotPassword, { email: forgotEmail });
             setSnackbarMessage('Password reset link sent to your email.');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);

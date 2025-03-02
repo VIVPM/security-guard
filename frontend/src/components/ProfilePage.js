@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
+import apiList from './apiList';
 
 const ProfilePage = () => {
     const [loading, setLoading] = useState(true);
@@ -54,7 +55,7 @@ const ProfilePage = () => {
     // Fetch current profile on mount
     useEffect(() => {
         axios
-            .get('https://security-guard-jsj0.onrender.com/apiProfile/profile', {
+            .get(apiList.getProfile, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => {
@@ -173,7 +174,7 @@ const ProfilePage = () => {
         data.append('emergencyContact', JSON.stringify(formData.emergencyContact));
         // Note: Background check is not editable in this form.
         try {
-            await axios.put('https://security-guard-jsj0.onrender.com/apiProfile/profile', data, {
+            await axios.put(apiList.putProfile, data, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'multipart/form-data',

@@ -16,6 +16,7 @@ import {
     Alert,
     Pagination
 } from '@mui/material';
+import apiList from '../components/apiList';
 
 // Helper: Format a date string to IST (e.g., "dd/mm/yyyy")
 const formatDateToIST = (dateStr) => {
@@ -63,7 +64,7 @@ const AttendanceDashboard = () => {
         const fetchPlaces = async () => {
             setLoading(true);
             try {
-                const res = await axios.get('https://security-guard-jsj0.onrender.com/apiProfile/guard', {
+                const res = await axios.get(apiList.assignedPlaces, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 });
                 setPlaces(res.data);
@@ -94,7 +95,7 @@ const AttendanceDashboard = () => {
         try {
             const coords = await getCurrentPosition();
             const res = await axios.post(
-                'https://security-guard-jsj0.onrender.com/apiAttendance/clock-in',
+                apiList.clockIn,
                 {
                     placeId: place._id,
                     latitude: coords.latitude,
@@ -124,7 +125,7 @@ const AttendanceDashboard = () => {
         try {
             const coords = await getCurrentPosition();
             const res = await axios.post(
-                'https://security-guard-jsj0.onrender.com/apiAttendance/clock-out',
+                apiList.clockOut,
                 {
                     placeId: place._id,
                     latitude: coords.latitude,

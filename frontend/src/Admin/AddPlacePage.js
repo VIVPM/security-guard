@@ -28,8 +28,9 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 // Import react-leaflet components and Leaflet CSS
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+// import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import apiList from '../components/apiList';
 
 // (Optional) Fix default icon issues in Leaflet
 import L from 'leaflet';
@@ -105,7 +106,7 @@ const AddPlacePage = () => {
     // Fetch guards with accepted background check status
     const fetchGuards = () => {
         axios
-            .get('https://security-guard-jsj0.onrender.com/admin/guards/accepted', {
+            .get(apiList.guardsAccepted, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => setGuards(res.data))
@@ -129,7 +130,7 @@ const AddPlacePage = () => {
         try {
             setLoading(true);
             const queryString = buildQueryString();
-            const res = await axios.get(`https://security-guard-jsj0.onrender.com/apiPlaces/places${queryString}`, {
+            const res = await axios.get(`${apiList.getPlaces}${queryString}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setPlaces(res.data);
@@ -201,7 +202,7 @@ const AddPlacePage = () => {
             data.append('placePhoto', file);
         }
         try {
-            await axios.post('https://security-guard-jsj0.onrender.com/apiPlaces/places', data, {
+            await axios.post(apiList.postPlaces, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -268,7 +269,7 @@ const AddPlacePage = () => {
             if (updateFile) {
                 data.append('placePhoto', updateFile);
             }
-            await axios.put(`https://security-guard-jsj0.onrender.com/apiPlaces/places/${selectedPlace._id}`, data, {
+            await axios.put(`${apiList.putPlaces}/${selectedPlace._id}`, data, {
                 headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Place updated successfully!', severity: 'success' });
@@ -286,7 +287,7 @@ const AddPlacePage = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`https://security-guard-jsj0.onrender.com/apiPlaces/places/${placeToDelete._id}`, {
+            await axios.delete(`${apiList.deletePlaces}/${placeToDelete._id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Place deleted successfully!', severity: 'success' });
@@ -302,7 +303,7 @@ const AddPlacePage = () => {
     // --- Track Person Handler using Leaflet ---
     const handleTrack = async (guardId, guardName) => {
         try {
-            const response = await axios.get(`https://security-guard-jsj0.onrender.com/apiAttendance/admin?guardId=${guardId}`, {
+            const response = await axios.get(`${apiList.trackGuard}?guardId=${guardId}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             const attendanceDocs = response.data;
@@ -711,7 +712,7 @@ const AddPlacePage = () => {
                 <DialogContent>
                     {trackLat && trackLng ? (
                         <Box>
-                            <MapContainer center={[trackLat, trackLng]} zoom={15} style={{ height: '400px', width: '100%' }}>
+                            {/* <MapContainer center={[trackLat, trackLng]} zoom={15} style={{ height: '400px', width: '100%' }}>
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -719,7 +720,34 @@ const AddPlacePage = () => {
                                 <Marker position={[trackLat, trackLng]}>
                                     <Popup>{trackAddress || 'Guard Location'}</Popup>
                                 </Marker>
-                            </MapContainer>
+                            </MapContainer> */}
+                            <Dialog open={trackDialogOpen} onClose={() => setTrackDialogOpen(false)} fullWidth maxWidth="md">
+                                <DialogTitle>Guard Location</DialogTitle>
+                                <DialogContent>
+                                    {trackLat && trackLng ? (
+                                        <iframe
+                                            width="100%"
+                                            height="400"
+                                            frameBorder="0"
+                                            style={{ border: 0 }}
+                                            src={`https://www.google.com/maps?q=${trackLat},${trackLng}&hl=en&z=15&output=embed`}
+                                            allowFullScreen
+                                            title="Guard Location Map"
+                                        ></iframe>
+                                    ) : (
+                                        <Typography>Loading location...</Typography>
+                                    )}
+                                    <Typography variant="body1" sx={{ mt: 2 }}>
+                                        Address: {trackAddress}
+                                    </Typography>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={() => setTrackDialogOpen(false)} variant="contained" color="primary">
+                                        Close
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+
                             <Typography variant="body1" sx={{ mt: 2 }}>
                                 Address: {trackAddress}
                             </Typography>

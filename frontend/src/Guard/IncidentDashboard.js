@@ -21,9 +21,11 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    Pagination, // <-- Import Pagination from MUI
+    Pagination,
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete'; // <-- Import Autocomplete
 import axios from 'axios';
+import apiList from '../components/apiList';
 
 const IncidentDashboard = () => {
     // -------------------------------
@@ -32,6 +34,8 @@ const IncidentDashboard = () => {
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+
     const [filters, setFilters] = useState({
         status: '',
         fromDate: '',
@@ -118,7 +122,7 @@ const IncidentDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`https://security-guard-jsj0.onrender.com/apiIncidents/incidents${qs}`, {
+            const response = await axios.get(`${apiList.getGuardIncidents}${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setIncidents(response.data);
@@ -155,7 +159,7 @@ const IncidentDashboard = () => {
         createVideoFiles.forEach((file) => data.append('videos', file));
 
         try {
-            await axios.post('https://security-guard-jsj0.onrender.com/apiIncidents/incidents', data, {
+            await axios.post(apiList.postIncidents, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -201,7 +205,7 @@ const IncidentDashboard = () => {
         updateVideoFiles.forEach((file) => data.append('videos', file));
 
         try {
-            await axios.put(`https://security-guard-jsj0.onrender.com/apiIncidents/incidents/${selectedIncident._id}`, data, {
+            await axios.put(`http://localhost:5000/apiIncidents/incidents/${selectedIncident._id}`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -225,7 +229,7 @@ const IncidentDashboard = () => {
     const handleDeleteIncident = async () => {
         setLoading(true);
         try {
-            await axios.delete(`https://security-guard-jsj0.onrender.com/apiIncidents/incidents/${selectedIncident._id}`, {
+            await axios.delete(`http://localhost:5000/apiIncidents/incidents/${selectedIncident._id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbar({ open: true, message: 'Incident deleted successfully!', severity: 'success' });
@@ -334,6 +338,18 @@ const IncidentDashboard = () => {
     };
 
     // -------------------------------
+    // Generate Autocomplete Suggestions
+    // -------------------------------
+    // In this example, we use unique incident locations as suggestions.
+    const suggestions = [
+        ...new Set(
+            incidents.flatMap((incident) =>
+                [incident.location, incident.address, incident.description].filter(Boolean)
+            )
+        ),
+    ];
+
+    // -------------------------------
     // Render Component
     // -------------------------------
     return (
@@ -347,17 +363,50 @@ const IncidentDashboard = () => {
                     <Button variant="contained" color="secondary" onClick={() => setFilterDialogOpen(true)}>
                         Filter
                     </Button>
-                    <TextField
-                        label="Search Incidents"
-                        variant="outlined"
-                        size="small"
+                    {/* Autocomplete search bar */}
+                    <Autocomplete
+                        freeSolo
+                        options={suggestions}
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        sx={{ width: 250 }}
+                        open={autocompleteOpen}
+                        onInputChange={(event, newInputValue) => {
+                            setSearchQuery(newInputValue);
+                            // Open suggestions only when there's text
+                            if (newInputValue) {
+                                setAutocompleteOpen(true);
+                            } else {
+                                setAutocompleteOpen(false);
+                            }
+                        }}
+                        onChange={(event, newValue) => {
+                            // When a suggestion is selected, update the input and close the dropdown.
+                            if (newValue) {
+                                setSearchQuery(newValue);
+                            }
+                            setAutocompleteOpen(false);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Search Incidents"
+                                variant="outlined"
+                                size="small"
+                                sx={{ width: 250 }}
+                            />
+                        )}
                     />
-                    <Button variant="contained" color="primary" onClick={fetchIncidents}>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setAutocompleteOpen(false);
+                            fetchIncidents();
+                        }}
+                    >
                         Search
                     </Button>
+
                 </Box>
             </Box>
 
@@ -627,6 +676,7 @@ const IncidentDashboard = () => {
                                             value={updateFormData.status}
                                             label="Status"
                                             onChange={handleUpdateChange}
+                                            disabled
                                         >
                                             <MenuItem value="Reported">Reported</MenuItem>
                                             <MenuItem value="Investigating">Investigating</MenuItem>
@@ -795,7 +845,7 @@ const IncidentDashboard = () => {
                                 label="Status"
                                 onChange={(e) => setTempFilters((prev) => ({ ...prev, status: e.target.value }))}
                             >
-                                <MenuItem value="">All</MenuItem>
+                                <MenuItem value="All">All</MenuItem>
                                 <MenuItem value="Reported">Reported</MenuItem>
                                 <MenuItem value="Investigating">Investigating</MenuItem>
                                 <MenuItem value="Resolved">Resolved</MenuItem>

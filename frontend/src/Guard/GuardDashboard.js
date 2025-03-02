@@ -1,4 +1,3 @@
-// src/pages/GuardDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import {
     Container,
@@ -21,15 +20,17 @@ import {
     FormControlLabel,
     Radio,
     RadioGroup,
-    Pagination, // <-- import Pagination from MUI
-    // IconButton,
+    Pagination,
 } from '@mui/material';
-// import CloseIcon from '@mui/icons-material/Close';
+import Autocomplete from '@mui/material/Autocomplete'; // Import Autocomplete component
 import axios from 'axios';
+import apiList from '../components/apiList';
 
 const GuardDashboard = () => {
     const [places, setPlaces] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+
     const [filters, setFilters] = useState({
         status: '',
         fromDate: '',
@@ -46,29 +47,12 @@ const GuardDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
-    // Use sessionStorage so that the dialog shows once per login session
-    // At the top of your component:
-    // const [locationPermissionDialogOpen, setLocationPermissionDialogOpen] = useState(() => {
-    //     // Show the dialog if the flag is not set in sessionStorage
-    //     return !sessionStorage.getItem('locationPermissionShown');
-    // });
-
-
-    // When the dialog is shown for the first time, mark it as shown in sessionStorage
-    // useEffect(() => {
-    //     if (locationPermissionDialogOpen) {
-    //         sessionStorage.setItem('locationPermissionShown', 'true');
-    //     }
-    // }, [locationPermissionDialogOpen]);
-
-
-    // Helper function to format date in IST (Indian format)
+    // Helper functions for date and time formatting
     const formatDateToIST = (dateStr) => {
         const options = { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' };
         return new Date(dateStr).toLocaleDateString('en-IN', options);
     };
 
-    // Helper function to format time in IST
     const formatTimeToIST = (dateStr, timeStr) => {
         const dateObj = new Date(dateStr);
         const [hours, minutes] = timeStr.split(':');
@@ -98,7 +82,7 @@ const GuardDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`https://security-guard-jsj0.onrender.com/apiProfile/guard${qs}`, {
+            const response = await axios.get(`${apiList.assignedPlaces}${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setPlaces(response.data);
@@ -122,15 +106,20 @@ const GuardDashboard = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters]);
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
+    // Compute suggestions based on place names (unique values)
+    const suggestions = [
+        ...new Set(
+            places.flatMap((place) => [place.placeName, place.address].filter(Boolean))
+        ),
+    ];
 
+
+    // --- Handlers ---
     const handleSearchClick = () => {
+        setAutocompleteOpen(false);
         fetchPlaces();
     };
 
-    // --- Filter Dialog Handlers ---
     const openFilterDialog = () => {
         setTempFilters({ ...filters });
         setFilterDialogOpen(true);
@@ -139,7 +128,6 @@ const GuardDashboard = () => {
     const applyFilter = () => {
         setFilters({ ...tempFilters });
         setFilterDialogOpen(false);
-        // fetchPlaces();
     };
 
     const clearFilter = () => {
@@ -165,65 +153,50 @@ const GuardDashboard = () => {
     // Calculate the displayed places for the current page.
     const displayedPlaces = places.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    // Handle page change
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
 
     return (
         <Container maxWidth="xl" sx={{ mt: 4 }}>
-            {/* Location Permission Dialog
-            <Dialog
-                open={locationPermissionDialogOpen}
-                onClose={() => setLocationPermissionDialogOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        position: 'absolute',
-                        top: 5,
-                        margin: 0,
-                    },
-                }}
-            >
-                <DialogTitle>
-                    Location Permission Required
-                    <IconButton
-                        aria-label="close"
-                        onClick={() => setLocationPermissionDialogOpen(false)}
-                        sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8,
-                            // color: (theme) => theme.palette.grey[500],
-                        }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent dividers>
-                    <Typography variant="body1">
-                        Please allow location tracking permission every time you log in, so that your location can be accurately tracked for security purposes.
-                    </Typography>
-                </DialogContent>
-            </Dialog> */}
-
-
-
-            {/* Header Row: Dashboard title on left, Filter, Search field/button on right */}
+            {/* Header Row */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">Guard Dashboard</Typography>
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <Button variant="contained" color="secondary" onClick={openFilterDialog}>
                         Filter
                     </Button>
-                    <TextField
-                        label="Search Places"
-                        variant="outlined"
-                        size="small"
+                    {/* Autocomplete search bar */}
+                    <Autocomplete
+                        freeSolo
+                        options={suggestions}
                         value={searchQuery}
-                        onChange={handleSearchChange}
-                        sx={{ width: 250 }}
+                        open={autocompleteOpen}
+                        onInputChange={(event, newInputValue) => {
+                            setSearchQuery(newInputValue);
+                            // Open suggestions only when there's text
+                            if (newInputValue) {
+                                setAutocompleteOpen(true);
+                            } else {
+                                setAutocompleteOpen(false);
+                            }
+                        }}
+                        onChange={(event, newValue) => {
+                            // When a suggestion is selected, update the input and close the dropdown.
+                            if (newValue) {
+                                setSearchQuery(newValue);
+                            }
+                            setAutocompleteOpen(false);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Search Places"
+                                variant="outlined"
+                                size="small"
+                                sx={{ width: 250 }}
+                            />
+                        )}
                     />
                     <Button variant="contained" color="primary" onClick={handleSearchClick}>
                         Search
@@ -257,7 +230,8 @@ const GuardDashboard = () => {
                                             Date: {formatDateToIST(place.date)}
                                         </Typography>
                                         <Typography variant="body2">
-                                            Time: {formatTimeToIST(place.date, place.startTime)} - {formatTimeToIST(place.date, place.endTime)}
+                                            Time: {formatTimeToIST(place.date, place.startTime)} -{' '}
+                                            {formatTimeToIST(place.date, place.endTime)}
                                         </Typography>
                                         <Typography variant="body2">
                                             Status: {place.status}
@@ -272,7 +246,7 @@ const GuardDashboard = () => {
                             </Grid>
                         ))}
                     </Grid>
-                    {/* Pagination: Always show pagination */}
+                    {/* Pagination */}
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <Pagination
                             count={Math.max(Math.ceil(places.length / itemsPerPage), 1)}
@@ -369,7 +343,8 @@ const GuardDashboard = () => {
                             </Typography>
                             <Typography>
                                 <strong>Time:</strong>{' '}
-                                {formatTimeToIST(selectedPlace.date, selectedPlace.startTime)} - {formatTimeToIST(selectedPlace.date, selectedPlace.endTime)}
+                                {formatTimeToIST(selectedPlace.date, selectedPlace.startTime)} -{' '}
+                                {formatTimeToIST(selectedPlace.date, selectedPlace.endTime)}
                             </Typography>
                             <Typography>
                                 <strong>Place Name:</strong> {selectedPlace.placeName}

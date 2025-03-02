@@ -30,6 +30,7 @@ import {
 } from 'chart.js';
 // Import the data labels plugin
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import apiList from '../components/apiList';
 
 // Plugin to display "No Data Available" text if a chart has no data
 const noDataPlugin = {
@@ -198,7 +199,7 @@ const Report = () => {
         const fetchGuards = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('https://security-guard-jsj0.onrender.com/admin/guards', {
+                const response = await axios.get(apiList.getGuards, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 // Filter for guards with backgroundCheck status "Accepted"
@@ -230,7 +231,7 @@ const Report = () => {
                 if (filterEndDate) params.append('endDate', filterEndDate);
                 queryParams = '?' + params.toString();
             }
-            const response = await axios.get(`https://security-guard-jsj0.onrender.com/apiReports/guard/${selectedGuard}${queryParams}`, {
+            const response = await axios.get(`${apiList.guardReport}/${selectedGuard}${queryParams}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setReportData(response.data);
@@ -342,7 +343,7 @@ const Report = () => {
         try {
             const token = localStorage.getItem('token');
             const profileRes = await axios.get(
-                `https://security-guard-jsj0.onrender.com/admin/guard/${selectedGuard}`,
+                `${apiList.singleGuard}/${selectedGuard}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const user = profileRes.data;
@@ -630,7 +631,7 @@ const Report = () => {
     const openAdminAnalyticsDialog = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('https://security-guard-jsj0.onrender.com/apiReports/all', {
+            const response = await axios.get(apiList.allGuards, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAdminAnalyticsData(response.data);

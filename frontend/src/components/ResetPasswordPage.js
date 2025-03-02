@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
+import apiList from './apiList';
 
 const ResetPasswordPage = () => {
     const { token } = useParams();
@@ -69,7 +70,7 @@ const ResetPasswordPage = () => {
         }
         setLoading(true);
         try {
-            const res = await axios.post('https://security-guard-jsj0.onrender.com/apiAuth/reset-password', {
+            const res = await axios.post(apiList.resetPassword, {
                 token,
                 password,
                 confirmPassword,

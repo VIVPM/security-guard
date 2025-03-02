@@ -12,14 +12,14 @@ import {
     List,
     ListItemButton,
     ListItemText,
-    useTheme,
     Box,
     useMediaQuery
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
-import { AuthContext } from '../components/AuthContext'; // Adjust path if needed
+import { AuthContext } from '../components/AuthContext';
+import apiList from './apiList';
 
 const AUTO_LOGOUT_TIME = 3600000; // 1 hour in milliseconds
 
@@ -42,9 +42,8 @@ const Navbar = () => {
     // Mobile Drawer state
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Responsive hooks
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    // Use device-based media query to detect mobile devices
+    const isMobile = useMediaQuery('(max-device-width:600px)');
 
     // Function to clear and restart the auto logout timer
     const resetLogoutTimer = () => {
@@ -69,7 +68,7 @@ const Navbar = () => {
                 }
             };
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.token]);
 
     // Fetch unread notifications count (every 30 seconds)
@@ -77,7 +76,7 @@ const Navbar = () => {
         if (auth.token) {
             const fetchUnreadCount = () => {
                 axios
-                    .get('https://security-guard-jsj0.onrender.com/apiNotifications', {
+                    .get(apiList.notification, {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                     })
                     .then((res) => {
@@ -143,9 +142,7 @@ const Navbar = () => {
                 {navItems.map((item, index) => (
                     <ListItemButton key={index} component={Link} to={item.path}>
                         <ListItemText primary={item.label} />
-                        {item.badge > 0 && (
-                            <Badge badgeContent={item.badge} color="error" />
-                        )}
+                        {item.badge > 0 && <Badge badgeContent={item.badge} color="error" />}
                     </ListItemButton>
                 ))}
                 <ListItemButton onClick={() => handleLogout()}>
@@ -178,13 +175,7 @@ const Navbar = () => {
                             ) : (
                                 <>
                                     {navItems.map((item, index) => (
-                                        <Button
-                                            key={index}
-                                            color="inherit"
-                                            component={Link}
-                                            to={item.path}
-                                            sx={{ ml: 1 }}
-                                        >
+                                        <Button key={index} color="inherit" component={Link} to={item.path} sx={{ ml: 1 }}>
                                             {item.badge ? (
                                                 <Badge badgeContent={item.badge} color="error">
                                                     {item.label}

@@ -233,7 +233,7 @@ router.get('/incidents', authMiddleware, async (req, res) => {
 });
 
 // PUT route to update incident status remains unchanged
-router.put('/incidents/:id/status', authMiddleware, async (req, res) => {
+router.put('/incidents/status/:id', authMiddleware, async (req, res) => {
     if (req.user.type !== 'Admin') {
         return res.status(403).json({ message: 'Access denied' });
     }
@@ -301,7 +301,7 @@ router.delete('/guard/:id', authMiddleware, async (req, res) => {
     }
 });
 
-router.put('/guards/:id/background-check', authMiddleware, async (req, res) => {
+router.put('/guards/background-check/:id', authMiddleware, async (req, res) => {
     const guardId = req.params.id;
     const { clearanceLevel, status, lastUpdated } = req.body; // Expect these fields from the frontend
     try {

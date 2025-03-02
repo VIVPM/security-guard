@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Place = require('../models/Place');
 const Incident = require('../models/Incident');
-const PDFDocument = require('pdfkit');
 
 // GET /apiReports/guard/:guardId
 router.get('/guard/:guardId', async (req, res) => {

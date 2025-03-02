@@ -270,13 +270,13 @@ router.put('/places/:id', upload.single('placePhoto'), authMiddleware, async (re
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date(shiftDate);
         endOfDay.setHours(23, 59, 59, 999);
-        const existingPlace = await Place.findOne({
-            guard,
-            date: { $gte: startOfDay, $lte: endOfDay },
-        });
-        if (existingPlace) {
-            return res.status(400).json({ message: 'Guard is already assigned to a place on this day.' });
-        }
+        // const existingPlace = await Place.findOne({
+        //     guard,
+        //     date: { $gte: startOfDay, $lte: endOfDay },
+        // });
+        // if (existingPlace) {
+        //     return res.status(400).json({ message: 'Guard is already assigned to a place on this day.' });
+        // }
 
         let updateData = {
             date: shiftDate,

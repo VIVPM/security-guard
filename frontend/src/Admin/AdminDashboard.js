@@ -27,6 +27,7 @@ import {
     Pagination, // <-- Import Pagination from MUI
 } from '@mui/material';
 import axios from 'axios';
+import apiList from '../components/apiList';
 // import { Add, Delete } from '@mui/icons-material';
 
 const AdminDashboard = () => {
@@ -86,7 +87,7 @@ const AdminDashboard = () => {
     // Fetch all guard profiles from the backend
     useEffect(() => {
         axios
-            .get('https://security-guard-jsj0.onrender.com/admin/guards', {
+            .get(apiList.getGuards, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => {
@@ -223,7 +224,7 @@ const AdminDashboard = () => {
             const params = {};
             if (searchTerm) params.search = searchTerm;
             if (filterType) params.type = filterType;
-            const response = await axios.get('https://security-guard-jsj0.onrender.com/admin/guards', {
+            const response = await axios.get(apiList.getGuards, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 params,
             });
@@ -254,7 +255,7 @@ const AdminDashboard = () => {
 
     const handleConfirmDelete = async () => {
         try {
-            await axios.delete(`https://security-guard-jsj0.onrender.com/admin/guard/${guardToDelete._id}`, {
+            await axios.delete(`${apiList.deleteGuard}/${guardToDelete._id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setGuards(guards.filter((g) => g._id !== guardToDelete._id));
@@ -369,7 +370,7 @@ const AdminDashboard = () => {
 
     const handleBgCheckSubmit = async () => {
         try {
-            await axios.put(`https://security-guard-jsj0.onrender.com/admin/guards/${selectedGuard._id}/background-check`, bgCheckData, {
+            await axios.put(`${apiList.backgroundCheck}/${selectedGuard._id}`, bgCheckData, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setSnackbarMessage('Background check updated successfully!');
@@ -377,7 +378,7 @@ const AdminDashboard = () => {
             setSnackbarOpen(true);
             // Optionally refresh guard list
             axios
-                .get('https://security-guard-jsj0.onrender.com/admin/guards', {
+                .get(apiList.getGuards, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 })
                 .then((res) => setGuards(res.data));
@@ -810,7 +811,7 @@ const AdminDashboard = () => {
                         data.append('trainingAndSkills', JSON.stringify(newGuardData.trainingAndSkills));
                         data.append('emergencyContact', JSON.stringify(newGuardData.emergencyContact));
                         try {
-                            await axios.post('https://security-guard-jsj0.onrender.com/admin/guards', data, {
+                            await axios.post(apiList.postGuards, data, {
                                 headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` }
                             });
                             setSnackbarMessage('Guard added successfully!');
@@ -818,7 +819,7 @@ const AdminDashboard = () => {
                             setSnackbarOpen(true);
                             handleAddModalClose();
                             // Optionally, refresh the guard list
-                            axios.get('https://security-guard-jsj0.onrender.com/admin/guards', {
+                            axios.get(apiList.getGuards, {
                                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                             }).then((res) => setGuards(res.data));
                         } catch (err) {

@@ -12,6 +12,7 @@ import {
     ListItemIcon,
 } from '@mui/material';
 import axios from 'axios';
+import apiList from './apiList';
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
@@ -26,7 +27,7 @@ const NotificationsPage = () => {
 
     useEffect(() => {
         axios
-            .get('https://security-guard-jsj0.onrender.com/apiNotifications', {
+            .get(apiList.notification, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             .then((res) => {
@@ -35,7 +36,7 @@ const NotificationsPage = () => {
                     // Wait 5 seconds before marking notifications as read
                     setTimeout(() => {
                         axios.put(
-                            'https://security-guard-jsj0.onrender.com/apiNotifications/read',
+                            apiList.readNotification,
                             {},
                             {
                                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },

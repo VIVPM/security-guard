@@ -15,6 +15,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
+import apiList from './apiList';
 
 const RegisterPage = () => {
     const history = useHistory();
@@ -170,7 +171,7 @@ const RegisterPage = () => {
             data.append('trainingAndSkills', JSON.stringify(formData.trainingAndSkills));
             data.append('emergencyContact', JSON.stringify(formData.emergencyContact));
 
-            await axios.post('https://security-guard-jsj0.onrender.com/apiAuth/register', data, {
+            await axios.post(apiList.signup, data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

@@ -21,9 +21,11 @@ import {
     TextField,
     Snackbar,
     Alert,
-    Pagination, // <-- Import Pagination from MUI
+    Pagination,
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete'; // Import Autocomplete
 import axios from 'axios';
+import apiList from '../components/apiList';
 
 const AdminIncidentDashboard = () => {
     const [incidents, setIncidents] = useState([]);
@@ -46,11 +48,24 @@ const AdminIncidentDashboard = () => {
 
     const [moreInfoDialogOpen, setMoreInfoDialogOpen] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+
 
     // Pagination state: show six incidents per page
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
     const displayedIncidents = incidents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    // Generate Autocomplete suggestions from multiple fields.
+    // This collects unique suggestions from location, address, description, and guard name.
+    const suggestions = [
+        ...new Set(
+            incidents.flatMap((incident) => {
+                const guardName = incident.guard?.personalInfo?.name;
+                return [incident.location, incident.address, incident.description, guardName];
+            }).filter(Boolean)
+        )
+    ];
 
     // Helper functions for formatting
     const formatDateToIST = (dateStr) => {
@@ -87,7 +102,7 @@ const AdminIncidentDashboard = () => {
         setLoading(true);
         try {
             const qs = buildQueryString();
-            const response = await axios.get(`https://security-guard-jsj0.onrender.com/admin/incidents${qs}`, {
+            const response = await axios.get(`${apiList.getIncidents}${qs}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             setIncidents(response.data);
@@ -117,7 +132,7 @@ const AdminIncidentDashboard = () => {
     const handleUpdateStatus = async () => {
         try {
             await axios.put(
-                `https://security-guard-jsj0.onrender.com/admin/incidents/${selectedIncident._id}/status`,
+                `${apiList.putIncidents}/${selectedIncident._id}`,
                 { status: updateStatus },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
@@ -136,41 +151,59 @@ const AdminIncidentDashboard = () => {
         setMoreInfoDialogOpen(true);
     };
 
-    // Filter dialog handlers
-    // Uncomment and modify if you need to apply filters
-    // const applyFilters = () => {
-    //     setFilters({ ...tempFilters });
-    //     setFilterDialogOpen(false);
-    // };
-
-    // const clearFilters = () => {
-    //     setTempFilters({ status: '', fromDate: '', toDate: '', fromTime: '', toTime: '' });
-    // };
-
     const handleSnackbarClose = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
     return (
         <Container maxWidth="xl" sx={{ mt: 4 }}>
-            {/* Header with Filter button and search bar */}
+            {/* Header with Filter button and Autocomplete search bar */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">Incident Dashboard</Typography>
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <Button variant="contained" color="secondary" onClick={() => setFilterDialogOpen(true)}>
                         Filter
                     </Button>
-                    <TextField
-                        label="Search Incidents"
-                        variant="outlined"
-                        size="small"
+                    {/* Autocomplete search bar that shows suggestions on focus and as you type */}
+                    <Autocomplete
+                        freeSolo
+                        open={autocompleteOpen}
+                        options={suggestions}
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        sx={{ width: 250 }}
+                        onInputChange={(event, newInputValue) => {
+                            setSearchQuery(newInputValue);
+                            // Open suggestions only if there is non-empty text
+                            setAutocompleteOpen(newInputValue.trim().length > 0);
+                        }}
+                        onChange={(event, newValue) => {
+                            // When a suggestion is selected, update the input and close the dropdown.
+                            if (newValue) {
+                                setSearchQuery(newValue);
+                            }
+                            setAutocompleteOpen(false);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Search Incidents"
+                                variant="outlined"
+                                size="small"
+                                sx={{ width: 250 }}
+                            />
+                        )}
                     />
-                    <Button variant="contained" color="primary" onClick={fetchIncidents}>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setAutocompleteOpen(false); // Hide the suggestions
+                            fetchIncidents();
+                        }}
+                    >
                         Search
                     </Button>
+
                 </Box>
             </Box>
 
@@ -413,7 +446,11 @@ const AdminIncidentDashboard = () => {
                     <Button onClick={() => setFilterDialogOpen(false)} variant="contained" color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={() => setTempFilters({ status: '', fromDate: '', toDate: '', fromTime: '', toTime: '' })} variant="contained" color="secondary">
+                    <Button
+                        onClick={() => setTempFilters({ status: '', fromDate: '', toDate: '', fromTime: '', toTime: '' })}
+                        variant="contained"
+                        color="secondary"
+                    >
                         Clear
                     </Button>
                     <Button onClick={() => { setFilters({ ...tempFilters }); setFilterDialogOpen(false); }} variant="contained" color="primary">

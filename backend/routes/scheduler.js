@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const Attendance = require('../models/Attendance');
 
 // Schedule a task to run at midnight every day (00:00)
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('45 16 * * *', async () => {
     try {
         // Define today's boundaries in local time
         const todayStart = new Date();
