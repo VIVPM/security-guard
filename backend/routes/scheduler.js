@@ -4,7 +4,7 @@ const Attendance = require('../models/Attendance');
 const Place = require('../models/Place');
 
 // Schedule a task to run at 17:00 (5:00 PM) every day.
-cron.schedule('25 17 * * *', async () => {
+cron.schedule('27 17 * * *', async () => {
     try {
         // Define today's boundaries in local time.
         const todayStart = new Date();
