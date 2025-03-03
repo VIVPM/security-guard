@@ -246,10 +246,16 @@ router.get('/date', auth, async (req, res) => {
                 });
             }
 
-            const startTimeIST = new Date(place.startTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-            const endTimeIST = new Date(place.endTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+            // Define options for the time format in IST
+            const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' };
 
+            // Convert the start and end times to IST format
+            const startTimeIST = new Date(place.startTime).toLocaleTimeString('en-US', options);
+            const endTimeIST = new Date(place.endTime).toLocaleTimeString('en-US', options);
+
+            // Create the shift time string in IST
             const shiftTime = `${startTimeIST} - ${endTimeIST}`;
+
 
             return {
                 guardId: place.guard._id,
