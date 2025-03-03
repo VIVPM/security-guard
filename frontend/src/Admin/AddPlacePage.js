@@ -59,6 +59,8 @@ const AddPlacePage = () => {
     const [places, setPlaces] = useState([]);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
+
 
     // Pagination state: show six places per page
     const [currentPage, setCurrentPage] = useState(1);
@@ -141,7 +143,7 @@ const AddPlacePage = () => {
     // Fetch places using search query and filters
     const fetchPlaces = async () => {
         try {
-            setLoading(true);
+            setPageLoading(true);
             const queryString = buildQueryString();
             const res = await axios.get(`${apiList.getPlaces}${queryString}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -151,7 +153,7 @@ const AddPlacePage = () => {
         } catch (err) {
             console.error('Error fetching places:', err);
         } finally {
-            setLoading(false);
+            setPageLoading(false);
         }
     };
 
@@ -392,7 +394,7 @@ const AddPlacePage = () => {
         })
         : guards;
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <Container sx={{ mt: 4, textAlign: 'center' }}>
                 <CircularProgress />
@@ -413,25 +415,22 @@ const AddPlacePage = () => {
                         Filter
                     </Button>
                     <Autocomplete
-                        freeSolo
-                        open={autocompleteOpen}
+                        open={autocompleteOpen} // Strictly control when suggestions are shown
                         onOpen={() => {
-                            if (!searching && searchQuery.trim().length > 0) {
-                                setAutocompleteOpen(true);
+                            if (!searching) {
+                                setAutocompleteOpen(true); // Open suggestions only if not searching
                             }
                         }}
-                        onClose={() => setAutocompleteOpen(false)}
-                        options={suggestions}
-                        value={searchQuery}
+                        onClose={() => setAutocompleteOpen(false)} // Close suggestions when triggered
+                        freeSolo // Assuming you’re using freeSolo mode
+                        options={suggestions} // Your list of suggestions
                         onInputChange={(event, newInputValue) => {
-                            setSearchQuery(newInputValue);
-                            setAutocompleteOpen(!searching && newInputValue.trim().length > 0);
-                        }}
-                        onChange={(event, newValue) => {
-                            if (newValue) {
-                                setSearchQuery(newValue);
+                            setSearchQuery(newInputValue); // Update the search query
+                            if (!searching && newInputValue.trim().length > 0) {
+                                setAutocompleteOpen(true); // Show suggestions only if not searching
+                            } else {
+                                setAutocompleteOpen(false);
                             }
-                            setAutocompleteOpen(false);
                         }}
                         renderInput={(params) => (
                             <TextField
@@ -441,7 +440,7 @@ const AddPlacePage = () => {
                                 size="small"
                                 sx={{ width: 250 }}
                                 inputRef={inputRef}
-                                onBlur={() => setAutocompleteOpen(false)}
+                                onBlur={() => setAutocompleteOpen(false)} // Close suggestions on blur
                             />
                         )}
                     />
@@ -449,14 +448,14 @@ const AddPlacePage = () => {
                         variant="contained"
                         color="primary"
                         onClick={() => {
-                            setSearching(true);
-                            setAutocompleteOpen(false);
+                            setSearching(true); // Indicate search is in progress
+                            setAutocompleteOpen(false); // Hide suggestions
                             if (inputRef.current) {
-                                inputRef.current.blur();
+                                inputRef.current.blur(); // Blur the input to trigger onBlur
                             }
-                            fetchPlaces().finally(() => setSearching(false));
+                            fetchPlaces() // Your search function
+                                .finally(() => setSearching(false)); // Reset searching flag when done
                         }}
-                        sx={{ ml: 2 }}
                     >
                         Search
                     </Button>

@@ -6,6 +6,8 @@ import {
     TableCell,
     TableContainer,
     TableHead,
+    InputAdornment,
+    IconButton,
     TableRow,
     Paper,
     RadioGroup,
@@ -13,6 +15,7 @@ import {
     CircularProgress,
     Button,
     Box,
+    MenuItem,
     Snackbar,
     Radio,
     Alert,
@@ -26,6 +29,8 @@ import {
     Avatar,
     Pagination, // <-- Import Pagination from MUI
 } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import axios from 'axios';
@@ -54,6 +59,9 @@ const AdminDashboard = () => {
     const [autocompleteOpen, setAutocompleteOpen] = useState(false);
     const [searching, setSearching] = useState(false);
     const inputRef = useRef(null);
+
+    const [showNewGuardPassword, setShowNewGuardPassword] = useState(false);
+
 
 
     // Delete confirmation dialog state
@@ -846,7 +854,36 @@ const AdminDashboard = () => {
                         <Box>
                             <TextField label="Name" name="name" value={newGuardData.personalInfo.name} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, name: e.target.value } })} fullWidth required margin="dense" />
                             <TextField label="Email" name="email" value={newGuardData.personalInfo.email} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, email: e.target.value } })} fullWidth required margin="dense" />
-                            <TextField label="Password" name="password" type="password" value={newGuardData.personalInfo.password} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, password: e.target.value } })} fullWidth required margin="dense" />
+                            <TextField
+                                label="Password"
+                                name="password"
+                                type={showNewGuardPassword ? 'text' : 'password'}
+                                value={newGuardData.personalInfo.password}
+                                onChange={(e) =>
+                                    setNewGuardData({
+                                        ...newGuardData,
+                                        personalInfo: {
+                                            ...newGuardData.personalInfo,
+                                            password: e.target.value,
+                                        },
+                                    })
+                                }
+                                fullWidth
+                                required
+                                margin="dense"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowNewGuardPassword((prev) => !prev)}
+                                                edge="end"
+                                            >
+                                                {showNewGuardPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />                            
                             <TextField label="Date of Birth" name="dateOfBirth" type="date" value={newGuardData.personalInfo.dateOfBirth} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, dateOfBirth: e.target.value } })} fullWidth required margin="dense" InputLabelProps={{ shrink: true }} />
                             <TextField
                                 select
@@ -874,8 +911,33 @@ const AdminDashboard = () => {
                                 <option value="Admin">Admin</option>
                                 <option value="Guard">Guard</option>
                             </TextField>
-                            <TextField label="Location" name="location" value={newGuardData.personalInfo.location} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, location: e.target.value } })} fullWidth required margin="dense" />
-                            <TextField label="Address" name="address" value={newGuardData.personalInfo.address} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, address: e.target.value } })} fullWidth margin="dense" />
+                            <TextField
+                                select
+                                label="Location"
+                                name="location"
+                                value={newGuardData.personalInfo.location}
+                                onChange={(e) =>
+                                    setNewGuardData({
+                                        ...newGuardData,
+                                        personalInfo: { ...newGuardData.personalInfo, location: e.target.value },
+                                    })
+                                }
+                                fullWidth
+                                required
+                                margin="dense"
+                            >
+                                {/* <MenuItem value=""></MenuItem> */}
+                                <MenuItem value="Bengaluru">Bengaluru</MenuItem>
+                                <MenuItem value="Mysuru">Mysuru</MenuItem>
+                                <MenuItem value="Mangalore">Mangalore</MenuItem>
+                                <MenuItem value="Hubli">Hubli</MenuItem>
+                                <MenuItem value="Belgaum">Belgaum</MenuItem>
+                                <MenuItem value="Kalaburagi">Kalaburagi</MenuItem>
+                                <MenuItem value="Davanagere">Davanagere</MenuItem>
+                                <MenuItem value="Ballari">Ballari</MenuItem>
+                                <MenuItem value="Shivamogga">Shivamogga</MenuItem>
+                                <MenuItem value="Tumakuru">Tumakuru</MenuItem>
+                            </TextField>                            <TextField label="Address" name="address" value={newGuardData.personalInfo.address} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, address: e.target.value } })} fullWidth margin="dense" />
                             <TextField label="Phone" name="phone" value={newGuardData.personalInfo.phone} onChange={(e) => setNewGuardData({ ...newGuardData, personalInfo: { ...newGuardData.personalInfo, phone: e.target.value } })} fullWidth margin="dense" />
                             <Button variant="outlined" component="label" fullWidth sx={{ mt: 1 }}>
                                 Upload Profile Picture

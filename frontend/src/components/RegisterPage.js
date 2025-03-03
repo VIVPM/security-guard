@@ -7,6 +7,8 @@ import {
     Box,
     Typography,
     Grid,
+    InputAdornment,
+    IconButton,
     Divider,
     Snackbar,
     Alert,
@@ -14,6 +16,8 @@ import {
 } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import { Add, Delete } from '@mui/icons-material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import apiList from './apiList';
 
@@ -74,6 +78,8 @@ const RegisterPage = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [showPassword, setShowPassword] = useState(false);
+
 
     // Handle file selection for profile picture
     const handleFileChange = (e) => {
@@ -238,13 +244,26 @@ const RegisterPage = () => {
                                 <TextField
                                     label="Password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     value={formData.personalInfo.password}
                                     onChange={handlePersonalInfoChange}
                                     fullWidth
                                     required
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() => setShowPassword((prev) => !prev)}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     label="User Type"

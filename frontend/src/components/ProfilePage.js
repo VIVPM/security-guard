@@ -274,7 +274,7 @@ const ProfilePage = () => {
                                     SelectProps={{ native: true }}
                                     required
                                 >
-                                    <option value="">Select</option>
+                                    {/* <option value="">Select</option> */}
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </TextField>
@@ -290,7 +290,7 @@ const ProfilePage = () => {
                                     required
                                     SelectProps={{ native: true }}
                                 >
-                                    <option value=""></option>
+                                    {/* <option value=""></option> */}
                                     <option value="Bengaluru">Bengaluru</option>
                                     <option value="Mysuru">Mysuru</option>
                                     <option value="Mangalore">Mangalore</option>

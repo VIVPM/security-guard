@@ -11,11 +11,15 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
 import apiList from './apiList';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const LoginPage = () => {
     const history = useHistory();
@@ -35,6 +39,9 @@ const LoginPage = () => {
     const [forgotDialogOpen, setForgotDialogOpen] = useState(false);
     const [forgotEmail, setForgotEmail] = useState('');
 
+    // New state for password visibility toggle
+    const [showPassword, setShowPassword] = useState(false);
+
     // Will hold the watch id returned by geolocation.watchPosition
     let watchId = null;
 
@@ -49,27 +56,7 @@ const LoginPage = () => {
             login(res.data.token);
             console.log(res);
 
-            // Check if the logged-in user is a Guard.
-            // Assuming res.data.user is returned with the login response
-            // if (res.data.user && res.data.user.personalInfo.type === 'Guard') {
-            //     // Request geolocation permission and start watching position changes
-            //     if ("geolocation" in navigator) {
-            //         watchId = navigator.geolocation.watchPosition(
-            //             (position) => {
-            //                 const { latitude, longitude } = position.coords;
-            //                 console.log('Coordinates:', latitude, longitude);
-            //                 axios.post('http://localhost:5000/apiLocations', { latitude, longitude }, {
-            //                     headers: { Authorization: `Bearer ${res.data.token}` }
-            //                 })
-            //                     .catch(err => console.error('Location update error:', err));
-            //             },
-            //             (error) => console.error('Error getting location:', error),
-            //             { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
-            //         );
-            //     } else {
-            //         console.error('Geolocation not available');
-            //     }
-            // }
+            // Geolocation tracking commented for brevity
 
             setSnackbarMessage('User logged in successfully!');
             setSnackbarSeverity('success');
@@ -140,11 +127,23 @@ const LoginPage = () => {
                         variant="outlined"
                         margin="normal"
                         fullWidth
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         value={password}
                         onChange={onChange}
                         required
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
                     <Box sx={{ textAlign: 'right', mt: 1 }}>
                         <Button color="primary" onClick={() => setForgotDialogOpen(true)}>

@@ -1,4 +1,3 @@
-// src/pages/ResetPasswordPage.jsx
 import React, { useState } from 'react';
 import {
     Container,
@@ -9,10 +8,14 @@ import {
     Snackbar,
     Alert,
     LinearProgress,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import apiList from './apiList';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const ResetPasswordPage = () => {
     const { token } = useParams();
@@ -30,6 +33,10 @@ const ResetPasswordPage = () => {
     // For password strength indicator
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [passwordFeedback, setPasswordFeedback] = useState('');
+
+    // State to toggle password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const onChange = (e) => {
         const { name, value } = e.target;
@@ -104,11 +111,23 @@ const ResetPasswordPage = () => {
                         variant="outlined"
                         margin="normal"
                         fullWidth
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         value={password}
                         onChange={onChange}
                         required
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
                     <Box sx={{ width: '100%', mb: 1 }}>
                         <LinearProgress variant="determinate" value={(passwordStrength / 5) * 100} />
@@ -119,11 +138,23 @@ const ResetPasswordPage = () => {
                         variant="outlined"
                         margin="normal"
                         fullWidth
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         name="confirmPassword"
                         value={confirmPassword}
                         onChange={onChange}
                         required
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                        edge="end"
+                                    >
+                                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
                     <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
                         {loading ? 'Resetting...' : 'Reset Password'}
