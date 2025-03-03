@@ -36,6 +36,8 @@ const AdminIncidentDashboard = () => {
 
     // For search & filter
     const [searchQuery, setSearchQuery] = useState('');
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+
     const [filters, setFilters] = useState({
         status: '',
         fromDate: '',
@@ -48,8 +50,6 @@ const AdminIncidentDashboard = () => {
 
     const [moreInfoDialogOpen, setMoreInfoDialogOpen] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-
 
     // Pagination state: show six incidents per page
     const [currentPage, setCurrentPage] = useState(1);
@@ -151,6 +151,16 @@ const AdminIncidentDashboard = () => {
         setMoreInfoDialogOpen(true);
     };
 
+    // New function: handleFindRoute, redirect to Google Maps directions using incident address
+    const handleFindRoute = (incident) => {
+        if (incident.address) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(incident.address)}`;
+            window.open(url, '_blank');
+        } else {
+            setSnackbar({ open: true, message: 'No address provided for this incident.', severity: 'error' });
+        }
+    };
+
     const handleSnackbarClose = () => {
         setSnackbar({ ...snackbar, open: false });
     };
@@ -172,11 +182,9 @@ const AdminIncidentDashboard = () => {
                         value={searchQuery}
                         onInputChange={(event, newInputValue) => {
                             setSearchQuery(newInputValue);
-                            // Open suggestions only if there is non-empty text
                             setAutocompleteOpen(newInputValue.trim().length > 0);
                         }}
                         onChange={(event, newValue) => {
-                            // When a suggestion is selected, update the input and close the dropdown.
                             if (newValue) {
                                 setSearchQuery(newValue);
                             }
@@ -192,18 +200,16 @@ const AdminIncidentDashboard = () => {
                             />
                         )}
                     />
-
                     <Button
                         variant="contained"
                         color="primary"
                         onClick={() => {
-                            setAutocompleteOpen(false); // Hide the suggestions
+                            setAutocompleteOpen(false); // Hide suggestions on search
                             fetchIncidents();
                         }}
                     >
                         Search
                     </Button>
-
                 </Box>
             </Box>
 
@@ -240,13 +246,16 @@ const AdminIncidentDashboard = () => {
                                     </CardContent>
                                     <CardActions>
                                         <Button variant="contained" color="primary" onClick={() => handleOpenMoreInfo(incident)}>
-                                            More Information
+                                            More Info
                                         </Button>
                                         {incident.status !== "Resolved" && (
                                             <Button variant="contained" color="secondary" onClick={() => handleOpenStatusDialog(incident)}>
                                                 Update Status
                                             </Button>
                                         )}
+                                        <Button variant="contained" color="primary" onClick={() => handleFindRoute(incident)}>
+                                            Find Route
+                                        </Button>
                                     </CardActions>
                                 </Card>
                             </Grid>

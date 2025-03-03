@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     Container,
     Table,
@@ -26,6 +26,8 @@ import {
     Avatar,
     Pagination, // <-- Import Pagination from MUI
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+
 import axios from 'axios';
 import apiList from '../components/apiList';
 // import { Add, Delete } from '@mui/icons-material';
@@ -49,6 +51,10 @@ const AdminDashboard = () => {
     // Modal for zoomed profile image
     const [zoomImage, setZoomImage] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+    const [searching, setSearching] = useState(false);
+    const inputRef = useRef(null);
+
 
     // Delete confirmation dialog state
     const [filterDialogOpen, setFilterDialogOpen] = useState(false);
@@ -113,90 +119,219 @@ const AdminDashboard = () => {
         setSelectedSection('');
     };
 
+    const suggestions = [
+        ...new Set(
+            guards.flatMap((guard) => {
+                const { name, location, phone, address } = guard.personalInfo || {};
+                return [name, location, phone, address].filter(Boolean);
+            })
+        )
+    ];
+
+    // Inside your AdminDashboard component, add or update the renderSectionForm function as follows:
+
     const renderSectionForm = () => {
         if (!selectedGuard) return null;
         switch (selectedSection) {
-            case 'workExperience':
+            case 'workExperience': {
+                const renderedExp = (
+                    (selectedGuard.workExperience &&
+                        selectedGuard.workExperience
+                            .map((exp, idx) => {
+                                // Check if at least one field is present
+                                if (!(exp.role || exp.company || exp.startDate || exp.endDate || exp.description || exp.url)) {
+                                    return null;
+                                }
+                                return (
+                                    <Box key={idx} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 1 }}>
+                                        {exp.role && (
+                                            <TextField
+                                                label="Role"
+                                                value={exp.role}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {exp.company && (
+                                            <TextField
+                                                label="Company"
+                                                value={exp.company}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {exp.startDate && (
+                                            <TextField
+                                                label="Start Date"
+                                                value={formatDate(exp.startDate)}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {exp.endDate && (
+                                            <TextField
+                                                label="End Date"
+                                                value={formatDate(exp.endDate)}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {exp.description && (
+                                            <TextField
+                                                label="Description"
+                                                value={exp.description}
+                                                fullWidth
+                                                margin="dense"
+                                                multiline
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {exp.url && (
+                                            <Box sx={{ mt: 1 }}>
+                                                <Typography variant="body2">
+                                                    <strong>URL:</strong>{' '}
+                                                    <MuiLink
+                                                        href={formatURL(exp.url)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {exp.url}
+                                                    </MuiLink>
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                );
+                            })
+                            .filter((item) => item !== null)) || []
+                );
                 return (
                     <Box>
-                        {selectedGuard.workExperience && selectedGuard.workExperience.length > 0 ? (
-                            selectedGuard.workExperience.map((exp, idx) => (
-                                <Box key={idx} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 1 }}>
-                                    <TextField label="Role" value={exp.role || ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="Company" value={exp.company || ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="Start Date" value={exp.startDate ? formatDate(exp.startDate) : ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="End Date" value={exp.endDate ? formatDate(exp.endDate) : ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="Description" value={exp.description || ''} fullWidth margin="dense" multiline InputProps={{ readOnly: true }} />
-                                    {exp.url && (
-                                        <Box sx={{ mt: 1 }}>
-                                            <Typography variant="body2">
-                                                <strong>URL:</strong>{' '}
-                                                <MuiLink href={formatURL(exp.url)} target="_blank" rel="noopener noreferrer">
-                                                    {exp.url}
-                                                </MuiLink>
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-                            ))
+                        {renderedExp.length > 0 ? renderedExp : <Typography variant="body2">No work experience provided.</Typography>}
+                    </Box>
+                );
+            }
+            case 'certifications': {
+                const renderedCert = (
+                    (selectedGuard.certifications &&
+                        selectedGuard.certifications
+                            .map((cert, idx) => {
+                                if (!(cert.title || cert.issuingAuthority || cert.dateIssued || cert.url)) {
+                                    return null;
+                                }
+                                return (
+                                    <Box key={idx} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 1 }}>
+                                        {cert.title && (
+                                            <TextField
+                                                label="Title"
+                                                value={cert.title}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {cert.issuingAuthority && (
+                                            <TextField
+                                                label="Issuing Authority"
+                                                value={cert.issuingAuthority}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {cert.dateIssued && (
+                                            <TextField
+                                                label="Date Issued"
+                                                value={formatDate(cert.dateIssued)}
+                                                fullWidth
+                                                margin="dense"
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                        )}
+                                        {cert.url && (
+                                            <Box sx={{ mt: 1 }}>
+                                                <Typography variant="body2">
+                                                    <strong>URL:</strong>{' '}
+                                                    <MuiLink
+                                                        href={formatURL(cert.url)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {cert.url}
+                                                    </MuiLink>
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                );
+                            })
+                            .filter((item) => item !== null)) || []
+                );
+                return (
+                    <Box>
+                        {renderedCert.length > 0 ? renderedCert : <Typography variant="body2">No certifications provided.</Typography>}
+                    </Box>
+                );
+            }
+            case 'trainingAndSkills': {
+                const renderedTrainings = (
+                    (selectedGuard.trainingAndSkills &&
+                        selectedGuard.trainingAndSkills.trainings &&
+                        selectedGuard.trainingAndSkills.trainings
+                            .map((training, idx) => {
+                                if (!training) return null;
+                                return (
+                                    <TextField
+                                        key={idx}
+                                        label="Training"
+                                        value={training}
+                                        fullWidth
+                                        margin="dense"
+                                        InputProps={{ readOnly: true }}
+                                    />
+                                );
+                            })
+                            .filter((item) => item !== null)) || []
+                );
+                const renderedSkills = (
+                    (selectedGuard.trainingAndSkills &&
+                        selectedGuard.trainingAndSkills.skills &&
+                        selectedGuard.trainingAndSkills.skills
+                            .map((skill, idx) => {
+                                if (!skill) return null;
+                                return (
+                                    <TextField
+                                        key={idx}
+                                        label="Skill"
+                                        value={skill}
+                                        fullWidth
+                                        margin="dense"
+                                        InputProps={{ readOnly: true }}
+                                    />
+                                );
+                            })
+                            .filter((item) => item !== null)) || []
+                );
+                return (
+                    <>
+                        {(renderedTrainings.length > 0 || renderedSkills.length > 0) ? (
+                            <Box sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 1 }}>
+                                {renderedTrainings.length > 0 && renderedTrainings}
+                                {renderedSkills.length > 0 && renderedSkills}
+                            </Box>
                         ) : (
-                            <Typography variant="body2">No work experience provided.</Typography>
+                            <Typography variant="body2">
+                                No training and skills provided
+                            </Typography>
                         )}
-                    </Box>
+                    </>
                 );
-            case 'certifications':
-                return (
-                    <Box>
-                        {selectedGuard.certifications && selectedGuard.certifications.length > 0 ? (
-                            selectedGuard.certifications.map((cert, idx) => (
-                                <Box key={idx} sx={{ mb: 2, p: 1, border: '1px solid #ddd', borderRadius: 1 }}>
-                                    <TextField label="Title" value={cert.title || ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="Issuing Authority" value={cert.issuingAuthority || ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    <TextField label="Date Issued" value={cert.dateIssued ? formatDate(cert.dateIssued) : ''} fullWidth margin="dense" InputProps={{ readOnly: true }} />
-                                    {cert.url && (
-                                        <Box sx={{ mt: 1 }}>
-                                            <Typography variant="body2">
-                                                <strong>URL:</strong>{' '}
-                                                <MuiLink href={formatURL(cert.url)} target="_blank" rel="noopener noreferrer">
-                                                    {cert.url}
-                                                </MuiLink>
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-                            ))
-                        ) : (
-                            <Typography variant="body2">No certifications provided.</Typography>
-                        )}
-                    </Box>
-                );
-            case 'trainingAndSkills':
-                return (
-                    <Box>
-                        <TextField
-                            label="Trainings"
-                            value={
-                                selectedGuard.trainingAndSkills && selectedGuard.trainingAndSkills.trainings
-                                    ? selectedGuard.trainingAndSkills.trainings.join(', ')
-                                    : ''
-                            }
-                            fullWidth
-                            margin="dense"
-                            InputProps={{ readOnly: true }}
-                        />
-                        <TextField
-                            label="Skills"
-                            value={
-                                selectedGuard.trainingAndSkills && selectedGuard.trainingAndSkills.skills
-                                    ? selectedGuard.trainingAndSkills.skills.join(', ')
-                                    : ''
-                            }
-                            fullWidth
-                            margin="dense"
-                            InputProps={{ readOnly: true }}
-                        />
-                    </Box>
-                );
+
+            }
             default:
                 return (
                     <Typography variant="body2">
@@ -250,7 +385,12 @@ const AdminDashboard = () => {
     }, [filterType]);
 
     const handleSearchButton = () => {
-        fetchGuards();
+        setSearching(true);
+        setAutocompleteOpen(false);
+        if (inputRef.current) {
+            inputRef.current.blur();
+        }
+        fetchGuards().finally(() => setSearching(false));
     };
 
     const handleConfirmDelete = async () => {
@@ -419,13 +559,37 @@ const AdminDashboard = () => {
                     <Button variant="contained" color="secondary" onClick={openFilterDialog}>
                         Filter
                     </Button>
-                    <TextField
-                        label="Search Guards"
-                        variant="outlined"
-                        size="small"
+                    <Autocomplete
+                        freeSolo
+                        open={autocompleteOpen}
+                        onOpen={() => {
+                            if (!searching && searchTerm.trim().length > 0) {
+                                setAutocompleteOpen(true);
+                            }
+                        }}
+                        onClose={() => setAutocompleteOpen(false)}
+                        options={suggestions}
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        sx={{ width: 250 }}
+                        onInputChange={(event, newInputValue) => {
+                            setSearchTerm(newInputValue);
+                            setAutocompleteOpen(!searching && newInputValue.trim().length > 0);
+                        }}
+                        onChange={(event, newValue) => {
+                            if (newValue) {
+                                setSearchTerm(newValue);
+                            }
+                            setAutocompleteOpen(false);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Search Guards"
+                                variant="outlined"
+                                size="small"
+                                sx={{ width: 250 }}
+                                inputRef={inputRef}
+                            />
+                        )}
                     />
                     <Button variant="contained" color="primary" onClick={handleSearchButton}>
                         Search

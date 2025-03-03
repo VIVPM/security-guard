@@ -7,6 +7,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
+const axios = require('axios');
 
 // Configure multer to use memory storage
 const upload = multer({ storage: multer.memoryStorage() });
@@ -25,6 +26,23 @@ function formatDateDDMMYYYY(date) {
     const month = ('0' + (d.getMonth() + 1)).slice(-2);
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
+}
+
+// Helper function to geocode an address using Geoapify
+async function geocodeAddress(address) {
+    const apiKey = process.env.GEOAPIFY_API_KEY;
+    if (!apiKey) {
+        throw new Error('Geoapify API key is not defined.');
+    }
+    const encodedAddress = encodeURIComponent(address);
+    const url = `https://api.geoapify.com/v1/geocode/search?text=${encodedAddress}&apiKey=${apiKey}&limit=1`;
+    const response = await axios.get(url);
+    if (!response.data || !response.data.features || response.data.features.length === 0) {
+        throw new Error('Geocoding failed: No results found');
+    }
+    // Geoapify returns coordinates as [longitude, latitude]
+    const { coordinates } = response.data.features[0].geometry;
+    return { latitude: coordinates[1], longitude: coordinates[0] };
 }
 
 // GET /api/incidents - List incidents with filtering and search
@@ -184,6 +202,17 @@ router.post('/incidents', authMiddleware, multiUpload, async (req, res) => {
                 });
                 videosUrls.push(result.secure_url);
             }
+        }
+
+        // Geocode the provided address to get latitude and longitude
+        let latitude, longitude;
+        try {
+            const coords = await geocodeAddress(address);
+            latitude = coords.latitude;
+            longitude = coords.longitude;
+        } catch (geocodeError) {
+            console.error('Geocoding error:', geocodeError.message);
+            return res.status(400).json({ message: 'Unable to geocode address.' });
         }
 
         const newIncident = new Incident({

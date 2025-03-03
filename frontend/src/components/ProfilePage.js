@@ -281,14 +281,29 @@ const ProfilePage = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
+                                    select
                                     label="Location"
                                     name="location"
                                     value={formData.personalInfo.location}
                                     onChange={handlePersonalInfoChange}
                                     fullWidth
                                     required
-                                />
+                                    SelectProps={{ native: true }}
+                                >
+                                    <option value=""></option>
+                                    <option value="Bengaluru">Bengaluru</option>
+                                    <option value="Mysuru">Mysuru</option>
+                                    <option value="Mangalore">Mangalore</option>
+                                    <option value="Hubli">Hubli</option>
+                                    <option value="Belgaum">Belgaum</option>
+                                    <option value="Kalaburagi">Kalaburagi</option>
+                                    <option value="Davanagere">Davanagere</option>
+                                    <option value="Ballari">Ballari</option>
+                                    <option value="Shivamogga">Shivamogga</option>
+                                    <option value="Tumakuru">Tumakuru</option>
+                                </TextField>
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     label="Phone"

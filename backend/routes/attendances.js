@@ -249,11 +249,11 @@ router.get('/date', auth, async (req, res) => {
             // Combine the place's date with startTime and endTime and format to IST.
             const startDateTime = new Date(place.date);
             const [startHour, startMinute] = place.startTime.split(':');
-            startDateTime.setHours(Number(startHour), Number(startMinute));
+            startDateTime.setHours(Number(startHour), Number(startMinute),0,0);
 
             const endDateTime = new Date(place.date);
             const [endHour, endMinute] = place.endTime.split(':');
-            endDateTime.setHours(Number(endHour), Number(endMinute));
+            endDateTime.setHours(Number(endHour), Number(endMinute),0,0);
 
             const shiftTime = `${startDateTime.toLocaleTimeString('en-IN', {
                 timeZone: 'Asia/Kolkata',

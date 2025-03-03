@@ -49,6 +49,13 @@ const IncidentSchema = new mongoose.Schema({
         enum: ['Reported', 'Investigating', 'Resolved'],
         default: 'Reported',
     },
+    // New attributes: store geocoded latitude and longitude
+    latitude: {
+        type: Number,
+    },
+    longitude: {
+        type: Number,
+    },
     // Automatically record the time the incident report was created
     createdAt: {
         type: Date,

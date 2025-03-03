@@ -1,5 +1,5 @@
-// export const server = "http://localhost:5000";
-export const server = "https://security-guard-jsj0.onrender.com";
+export const server = "http://localhost:5000";
+// export const server = "https://security-guard-jsj0.onrender.com";
 const apiList = {
     login: `${server}/apiAuth/login`,
     signup: `${server}/apiAuth/register`,

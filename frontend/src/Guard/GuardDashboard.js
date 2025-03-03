@@ -22,7 +22,7 @@ import {
     RadioGroup,
     Pagination,
 } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete'; // Import Autocomplete component
+import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
 import apiList from '../components/apiList';
 
@@ -30,7 +30,6 @@ const GuardDashboard = () => {
     const [places, setPlaces] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-
     const [filters, setFilters] = useState({
         status: '',
         fromDate: '',
@@ -113,7 +112,6 @@ const GuardDashboard = () => {
         ),
     ];
 
-
     // --- Handlers ---
     const handleSearchClick = () => {
         setAutocompleteOpen(false);
@@ -143,6 +141,13 @@ const GuardDashboard = () => {
     const handleMoreInfo = (place) => {
         setSelectedPlace(place);
         setMoreInfoModalOpen(true);
+    };
+
+    // New: Handler to find route via Google Maps.
+    const handleFindRoute = (address) => {
+        // Construct the URL for Google Maps directions.
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+        window.open(url, '_blank');
     };
 
     const handleSnackbarClose = (event, reason) => {
@@ -241,6 +246,17 @@ const GuardDashboard = () => {
                                         <Button variant="contained" color="primary" size="small" onClick={() => handleMoreInfo(place)}>
                                             More Info
                                         </Button>
+                                        {place.status !== 'Completed' && (
+                                            <Button
+                                                variant="contained"
+                                                color="info"
+                                                size="small"
+                                                onClick={() => handleFindRoute(place.address)}
+                                            >
+                                                Find Route
+                                            </Button>
+                                        )}
+
                                     </CardActions>
                                 </Card>
                             </Grid>

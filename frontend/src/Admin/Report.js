@@ -673,7 +673,7 @@ const Report = () => {
         : { labels: [], datasets: [{ data: [] }] };
 
     return (
-        <Container sx={{ mt: 4, minHeight: '140vh' }}>
+        <Container sx={{ mt: 4, minHeight: '150vh' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" gutterBottom>
                     Report

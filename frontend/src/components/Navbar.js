@@ -42,8 +42,8 @@ const Navbar = () => {
     // Mobile Drawer state
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Use device-based media query to detect mobile devices
-    const isMobile = useMediaQuery('(max-device-width:600px)');
+    // Use max-width instead of max-device-width to detect mobile viewports (solves landscape issue)
+    const isMobile = useMediaQuery('(max-width:600px)');
 
     // Function to clear and restart the auto logout timer
     const resetLogoutTimer = () => {
@@ -68,7 +68,7 @@ const Navbar = () => {
                 }
             };
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.token]);
 
     // Fetch unread notifications count (every 30 seconds)

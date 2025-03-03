@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     Container,
     Box,
@@ -26,9 +26,8 @@ import {
     Pagination,
     CircularProgress,
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete'; // Import Autocomplete
 import axios from 'axios';
-// Import react-leaflet components and Leaflet CSS
-// import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import apiList from '../components/apiList';
 
@@ -43,6 +42,8 @@ L.Icon.Default.mergeOptions({
 
 const AddPlacePage = () => {
     // State for the create form
+    // const inputRef = useRef(null);
+
     const [formData, setFormData] = useState({
         date: '',
         startTime: '',
@@ -58,7 +59,6 @@ const AddPlacePage = () => {
     const [places, setPlaces] = useState([]);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [loading, setLoading] = useState(false);
-    // const [placesLoading, setPlacesLoading] = useState(false);
 
     // Pagination state: show six places per page
     const [currentPage, setCurrentPage] = useState(1);
@@ -70,6 +70,10 @@ const AddPlacePage = () => {
 
     // State for search and filters
     const [searchQuery, setSearchQuery] = useState('');
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+    const [searching, setSearching] = useState(false);
+    const inputRef = useRef(null);
+
     const [filters, setFilters] = useState({
         status: '',
         fromDate: '',
@@ -125,6 +129,15 @@ const AddPlacePage = () => {
         return params.toString() ? `?${params.toString()}` : '';
     };
 
+    const suggestions = [
+        ...new Set(
+            places.flatMap((place) => {
+                const guardName = place.guard?.personalInfo?.name;
+                return [place.placeName, place.address, place.description, guardName];
+            }).filter(Boolean)
+        )
+    ];
+
     // Fetch places using search query and filters
     const fetchPlaces = async () => {
         try {
@@ -165,11 +178,12 @@ const AddPlacePage = () => {
 
     // --- Lifecycle Hooks ---
     useEffect(() => {
-        const fetchData = async () => {
-            await Promise.all([fetchGuards(), fetchPlaces()]);
-        };
-        fetchData();
-        // You can include filters if needed:
+        // const fetchData = async () => {
+        //     await Promise.all([fetchGuards(), fetchPlaces()]);
+        // };
+        // fetchData();
+        fetchGuards();
+        fetchPlaces();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters]);
 
@@ -300,7 +314,7 @@ const AddPlacePage = () => {
         }
     };
 
-    // --- Track Person Handler using Leaflet ---
+    // --- Track Person Handler using Leaflet / Google Maps iframe ---
     const handleTrack = async (guardId, guardName) => {
         try {
             const response = await axios.get(`${apiList.trackGuard}?guardId=${guardId}`, {
@@ -398,17 +412,55 @@ const AddPlacePage = () => {
                     <Button variant="contained" color="secondary" onClick={openFilterDialog}>
                         Filter
                     </Button>
-                    <TextField
-                        label="Search Places"
-                        variant="outlined"
-                        size="small"
+                    <Autocomplete
+                        freeSolo
+                        open={autocompleteOpen}
+                        onOpen={() => {
+                            if (!searching && searchQuery.trim().length > 0) {
+                                setAutocompleteOpen(true);
+                            }
+                        }}
+                        onClose={() => setAutocompleteOpen(false)}
+                        options={suggestions}
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        sx={{ width: 250 }}
+                        onInputChange={(event, newInputValue) => {
+                            setSearchQuery(newInputValue);
+                            setAutocompleteOpen(!searching && newInputValue.trim().length > 0);
+                        }}
+                        onChange={(event, newValue) => {
+                            if (newValue) {
+                                setSearchQuery(newValue);
+                            }
+                            setAutocompleteOpen(false);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Search Places"
+                                variant="outlined"
+                                size="small"
+                                sx={{ width: 250 }}
+                                inputRef={inputRef}
+                                onBlur={() => setAutocompleteOpen(false)}
+                            />
+                        )}
                     />
-                    <Button variant="contained" color="primary" onClick={fetchPlaces}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setSearching(true);
+                            setAutocompleteOpen(false);
+                            if (inputRef.current) {
+                                inputRef.current.blur();
+                            }
+                            fetchPlaces().finally(() => setSearching(false));
+                        }}
+                        sx={{ ml: 2 }}
+                    >
                         Search
                     </Button>
+
                 </Box>
             </Box>
 
@@ -598,7 +650,7 @@ const AddPlacePage = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="outlined" component="label" fullWidth>
+                                <Button variant="outlined" component="label" fullWidth sx={{ mt: 1 }}>
                                     Upload Place Photo
                                     <input type="file" hidden accept="image/*" onChange={handleFileChange} />
                                 </Button>
@@ -622,79 +674,79 @@ const AddPlacePage = () => {
             </Dialog>
 
             {/* Display Created Places as Cards */}
-                <Grid container spacing={2}>
-                    {places.length === 0 ? (
-                        <Grid item xs={12}>
-                            <Typography variant="h6" align="center">
-                                No places assigned
-                            </Typography>
-                        </Grid>
-                    ) : (
-                        displayedPlaces.map((place) => (
-                            <Grid item xs={12} sm={6} md={4} key={place._id}>
-                                <Card>
-                                    {place.placePhoto && (
-                                        <CardMedia
-                                            component="img"
-                                            height="140"
-                                            image={place.placePhoto}
-                                            alt={place.placeName}
-                                        />
+            <Grid container spacing={2}>
+                {places.length === 0 ? (
+                    <Grid item xs={12}>
+                        <Typography variant="h6" align="center">
+                            No places assigned
+                        </Typography>
+                    </Grid>
+                ) : (
+                    displayedPlaces.map((place) => (
+                        <Grid item xs={12} sm={6} md={4} key={place._id}>
+                            <Card>
+                                {place.placePhoto && (
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={place.placePhoto}
+                                        alt={place.placeName}
+                                    />
+                                )}
+                                <CardContent>
+                                    <Typography variant="h6">Place: {place.placeName}</Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Assigned Guard: {place.guard?.personalInfo?.name || 'N/A'}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Status: {place.status || 'N/A'}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ gap: 0.5 }}>
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleMoreInfo(place)}
+                                    >
+                                        More Info
+                                    </Button>
+                                    {place.status !== 'Completed' && (
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={() => handleUpdate(place)}
+                                        >
+                                            Update Details
+                                        </Button>
                                     )}
-                                    <CardContent>
-                                        <Typography variant="h6">Place: {place.placeName}</Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Assigned Guard: {place.guard?.personalInfo?.name || 'N/A'}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Status: {place.status || 'N/A'}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions sx={{ gap: 0.5 }}>
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDelete(place)}
+                                    >
+                                        Delete Place
+                                    </Button>
+                                    {place.status !== 'Completed' && (
                                         <Button
                                             size="small"
                                             variant="contained"
-                                            color="primary"
-                                            onClick={() => handleMoreInfo(place)}
+                                            color="info"
+                                            onClick={() =>
+                                                handleTrack(place.guard?._id, place.guard?.personalInfo?.name)
+                                            }
                                         >
-                                            More Info
+                                            Track Person
                                         </Button>
-                                        {place.status !== 'Completed' && (
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                color="secondary"
-                                                onClick={() => handleUpdate(place)}
-                                            >
-                                                Update Details
-                                            </Button>
-                                        )}
-                                        <Button
-                                            size="small"
-                                            variant="contained"
-                                            color="error"
-                                            onClick={() => handleDelete(place)}
-                                        >
-                                            Delete Place
-                                        </Button>
-                                        {place.status !== 'Completed' && (
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                color="info"
-                                                onClick={() =>
-                                                    handleTrack(place.guard?._id, place.guard?.personalInfo?.name)
-                                                }
-                                            >
-                                                Track Person
-                                            </Button>
-                                        )}
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))
-                    )}
-                </Grid>
+                                    )}
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ))
+                )}
+            </Grid>
 
             {/* Pagination: Always show at the bottom center */}
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
@@ -706,48 +758,21 @@ const AddPlacePage = () => {
                 />
             </Box>
 
-            {/* Track Person Dialog using Leaflet */}
+            {/* Track Person Dialog using Google Maps iframe */}
             <Dialog open={trackDialogOpen} onClose={() => setTrackDialogOpen(false)} fullWidth maxWidth="md">
                 <DialogTitle>Guard Location</DialogTitle>
                 <DialogContent>
                     {trackLat && trackLng ? (
                         <Box>
-                            {/* <MapContainer center={[trackLat, trackLng]} zoom={15} style={{ height: '400px', width: '100%' }}>
-                                <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                <Marker position={[trackLat, trackLng]}>
-                                    <Popup>{trackAddress || 'Guard Location'}</Popup>
-                                </Marker>
-                            </MapContainer> */}
-                            <Dialog open={trackDialogOpen} onClose={() => setTrackDialogOpen(false)} fullWidth maxWidth="md">
-                                <DialogTitle>Guard Location</DialogTitle>
-                                <DialogContent>
-                                    {trackLat && trackLng ? (
-                                        <iframe
-                                            width="100%"
-                                            height="400"
-                                            frameBorder="0"
-                                            style={{ border: 0 }}
-                                            src={`https://www.google.com/maps?q=${trackLat},${trackLng}&hl=en&z=15&output=embed`}
-                                            allowFullScreen
-                                            title="Guard Location Map"
-                                        ></iframe>
-                                    ) : (
-                                        <Typography>Loading location...</Typography>
-                                    )}
-                                    <Typography variant="body1" sx={{ mt: 2 }}>
-                                        Address: {trackAddress}
-                                    </Typography>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={() => setTrackDialogOpen(false)} variant="contained" color="primary">
-                                        Close
-                                    </Button>
-                                </DialogActions>
-                            </Dialog>
-
+                            <iframe
+                                width="100%"
+                                height="400"
+                                frameBorder="0"
+                                style={{ border: 0 }}
+                                src={`https://www.google.com/maps?q=${trackLat},${trackLng}&hl=en&z=15&output=embed`}
+                                allowFullScreen
+                                title="Guard Location Map"
+                            ></iframe>
                             <Typography variant="body1" sx={{ mt: 2 }}>
                                 Address: {trackAddress}
                             </Typography>
