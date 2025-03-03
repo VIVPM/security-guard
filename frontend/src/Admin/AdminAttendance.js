@@ -32,6 +32,18 @@ const AdminAttendance = () => {
         setSubmitted(false);
     };
 
+    const formatTimeToIST = (dateStr, timeStr) => {
+        const dateObj = new Date(dateStr);
+        const [hours, minutes] = timeStr.split(':');
+        dateObj.setHours(Number(hours), Number(minutes), 0, 0);
+        return dateObj.toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    };
+
     const fetchAttendance = async () => {
         setLoading(true);
         try {
@@ -126,7 +138,10 @@ const AdminAttendance = () => {
                                     <TableCell>{record.guardName}</TableCell>
                                     <TableCell>{record.placeName}</TableCell>
                                     <TableCell>{record.address}</TableCell>
-                                    <TableCell>{record.shiftTime}</TableCell>
+                                    {/* <TableCell>{record.shiftTime}</TableCell> */}
+                                    <TableCell>
+                                        {formatTimeToIST(selectedDate, record.startTime)} - {formatTimeToIST(selectedDate, record.endTime)}
+                                    </TableCell>
                                     <TableCell>
                                         {record.checkInTime
                                             ? formatTime(record.checkInTime)

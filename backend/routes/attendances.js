@@ -246,30 +246,7 @@ router.get('/date', auth, async (req, res) => {
                 });
             }
 
-            // Define options for the time format in IST
-            const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' };
-
-            // Get the base date from place.date (assuming it's a Date object or valid date string)
-            const date = new Date(place.date);
-
-            // Parse the start and end times (e.g., '09:00') into hours and minutes
-            const [startHour, startMinute] = place.startTime.split(':').map(Number);
-            const [endHour, endMinute] = place.endTime.split(':').map(Number);
-
-            // Create Date objects for start and end times using the base date
-            const startDateTime = new Date(date);
-            startDateTime.setHours(startHour, startMinute, 0, 0);
-
-            const endDateTime = new Date(date);
-            endDateTime.setHours(endHour, endMinute, 0, 0);
-
-            // Convert to IST format
-            const startTimeIST = startDateTime.toLocaleTimeString('en-US', options);
-            const endTimeIST = endDateTime.toLocaleTimeString('en-US', options);
-
-            // Create the shift time string in IST
-            const shiftTime = `${startTimeIST} - ${endTimeIST}`;
-
+            const shiftTime = `${place.startTime} - ${place.endTime}`;
 
             return {
                 guardId: place.guard._id,
@@ -280,7 +257,8 @@ router.get('/date', auth, async (req, res) => {
                 checkInTime: record && record.checkInTime ? record.checkInTime : null,
                 checkOutTime: record && record.checkOutTime ? record.checkOutTime : null,
                 status: place.status,
-                shiftTime
+                startTime:place.startTime,
+                endTime:place.endTime,
             };
         }));
         res.json(results);
