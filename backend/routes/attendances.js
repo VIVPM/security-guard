@@ -255,15 +255,7 @@ router.get('/date', auth, async (req, res) => {
             const [endHour, endMinute] = place.endTime.split(':');
             endDateTime.setHours(Number(endHour), Number(endMinute),0,0);
 
-            const shiftTime = `${startDateTime.toLocaleTimeString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                hour: '2-digit',
-                minute: '2-digit'
-            })} - ${endDateTime.toLocaleTimeString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                hour: '2-digit',
-                minute: '2-digit'
-            })}`;
+            const shiftTime = `${place.startTime} - ${place.endTime}`;
 
             return {
                 guardId: place.guard._id,
