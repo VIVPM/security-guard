@@ -21,15 +21,12 @@ const AdminAttendance = () => {
     const today = new Date().toISOString().split('T')[0];
     const [selectedDate, setSelectedDate] = useState(today);
     const [attendanceData, setAttendanceData] = useState([]);
+    const [fetchedDate, setFetchedDate] = useState(null);
     const [loading, setLoading] = useState(false);
-    // State to track if data has been fetched (submitted) so that the Action column is displayed.
-    const [submitted, setSubmitted] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const handleDateChange = (e) => {
         setSelectedDate(e.target.value);
-        // Reset submitted flag if the date changes.
-        setSubmitted(false);
     };
 
     const formatTimeToIST = (dateStr, timeStr) => {
@@ -53,8 +50,7 @@ const AdminAttendance = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setAttendanceData(response.data);
-            // Mark as submitted so that the Action column is shown.
-            setSubmitted(true);
+            setFetchedDate(selectedDate);
         } catch (error) {
             console.error('Error fetching attendance:', error);
             setSnackbar({ open: true, message: 'Error fetching attendance.', severity: 'error' });
@@ -63,13 +59,12 @@ const AdminAttendance = () => {
         }
     };
 
-    // Auto fetch attendance on mount if the default (today) is selected.
     useEffect(() => {
         if (selectedDate === today) {
             fetchAttendance();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only on mount
+    }, []);
 
     const handleSendEmail = async (guardId) => {
         try {
@@ -86,7 +81,6 @@ const AdminAttendance = () => {
         }
     };
 
-    // Helper function to format time if present.
     const formatTime = (time) => {
         if (!time) return null;
         return new Date(time).toLocaleTimeString();
@@ -128,8 +122,7 @@ const AdminAttendance = () => {
                                 <TableCell>Check In Time</TableCell>
                                 <TableCell>Check Out Time</TableCell>
                                 <TableCell>Status</TableCell>
-                                {/* Show the Action column only when the data has been fetched for today's date */}
-                                {submitted && selectedDate === today && <TableCell>Action</TableCell>}
+                                {fetchedDate === today && <TableCell>Action</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -138,7 +131,6 @@ const AdminAttendance = () => {
                                     <TableCell>{record.guardName}</TableCell>
                                     <TableCell>{record.placeName}</TableCell>
                                     <TableCell>{record.address}</TableCell>
-                                    {/* <TableCell>{record.shiftTime}</TableCell> */}
                                     <TableCell>
                                         {formatTimeToIST(selectedDate, record.startTime)} - {formatTimeToIST(selectedDate, record.endTime)}
                                     </TableCell>
@@ -153,7 +145,7 @@ const AdminAttendance = () => {
                                             : `${record.guardName} didn't check out yet`}
                                     </TableCell>
                                     <TableCell>{record.status}</TableCell>
-                                    {submitted && selectedDate === today && (
+                                    {fetchedDate === today && (
                                         <TableCell>
                                             <Button
                                                 variant="contained"
@@ -166,9 +158,9 @@ const AdminAttendance = () => {
                                     )}
                                 </TableRow>
                             ))}
-                            {attendanceData.length === 0 && (
+                            {attendanceData.length === 0 && fetchedDate !== null && (
                                 <TableRow>
-                                    <TableCell colSpan={submitted && selectedDate === today ? 8 : 7} align="center">
+                                    <TableCell colSpan={fetchedDate === today ? 8 : 7} align="center">
                                         No attendance records found for this date.
                                     </TableCell>
                                 </TableRow>
