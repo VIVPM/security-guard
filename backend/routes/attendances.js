@@ -246,16 +246,10 @@ router.get('/date', auth, async (req, res) => {
                 });
             }
 
-            // Combine the place's date with startTime and endTime and format to IST.
-            const startDateTime = new Date(place.date);
-            const [startHour, startMinute] = place.startTime.split(':');
-            startDateTime.setHours(Number(startHour), Number(startMinute),0,0);
+            const startTimeIST = new Date(place.startTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+            const endTimeIST = new Date(place.endTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
 
-            const endDateTime = new Date(place.date);
-            const [endHour, endMinute] = place.endTime.split(':');
-            endDateTime.setHours(Number(endHour), Number(endMinute),0,0);
-
-            const shiftTime = `${place.startTime} - ${place.endTime}`;
+            const shiftTime = `${startTimeIST} - ${endTimeIST}`;
 
             return {
                 guardId: place.guard._id,
