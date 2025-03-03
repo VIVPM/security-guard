@@ -71,7 +71,7 @@ router.post('/clock-in', auth, async (req, res) => {
             assignedPlace.longitude
         );
         const allowedDistance = 1; // allowed threshold in kilometers
-        console.log(distance);
+        // console.log(distance);
         if (distance > allowedDistance) {
             return res.status(400).json({
                 message: `You are not at the assigned place. Current distance is ${distance.toFixed(2)} meters.`
@@ -157,7 +157,7 @@ router.post('/clock-out', auth, async (req, res) => {
 
         // Convert current time to IST
         const nowIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-        console.log(formatTime(shiftEnd)); // For debugging
+        // console.log(formatTime(shiftEnd)); // For debugging
 
         // Ensure current time in IST is at or after shift end.
         if (nowIST < shiftEnd) {

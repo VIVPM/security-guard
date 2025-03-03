@@ -48,9 +48,9 @@ app.use('/apiReports',reportRouter);
 app.use('/apiAttendance',attendanceRouter);
 
 app.get("*", (req, res) => {
-    if (req.originalUrl.startsWith("/apiAuth") || req.originalUrl.startsWith("/apiProfile") || req.originalUrl.startsWith("/admin") || req.originalUrl.startsWith("/apiPlaces") || req.originalUrl.startsWith("/apiNotifications") || req.originalUrl.startsWith("/apiReports") || req.originalUrl.startsWith("/apiAttendance")) {
-        return res.status(404).json({ message: "API route not found" });
-    }
+    // if (req.originalUrl.startsWith("/apiAuth") || req.originalUrl.startsWith("/apiProfile") || req.originalUrl.startsWith("/admin") || req.originalUrl.startsWith("/apiPlaces") || req.originalUrl.startsWith("/apiNotifications") || req.originalUrl.startsWith("/apiReports") || req.originalUrl.startsWith("/apiAttendance")) {
+    //     return res.status(404).json({ message: "API route not found" });
+    // }
     res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
