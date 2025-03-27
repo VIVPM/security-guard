@@ -2,48 +2,66 @@ import { useEffect, useRef, useState } from "react";
 import ChatbotIcon from "./ChatbotIcon";
 import ChatForm from "./ChatForm";
 import ChatMessage from "./ChatMessage";
-import { securitySystem } from "./securitySystem";
+import { securitySystem as initialSecuritySystem } from "./securitySystem";
 import "./Chatbot.css";
+
 const Chatbot = () => {
     const chatBodyRef = useRef();
     const [showChatbot, setShowChatbot] = useState(false);
+    const [securitySystem, setSecuritySystem] = useState(initialSecuritySystem); // Fixed typo
     const [chatHistory, setChatHistory] = useState([
         {
             hideInChat: true,
             role: "model",
-            text: securitySystem,
+            text: initialSecuritySystem, // Use initial value directly
         },
     ]);
+
     const generateBotResponse = async (history) => {
-        // Helper function to update chat history
         const apiKey = process.env.REACT_APP_API_KEY;
         const updateHistory = (text, isError = false) => {
-            setChatHistory((prev) => [...prev.filter((msg) => msg.text !== "Thinking..."), { role: "model", text, isError }]);
+            setChatHistory((prev) => [
+                ...prev.filter((msg) => msg.text !== "Thinking..."),
+                { role: "model", text, isError },
+            ]);
+            if (!isError) {
+                setSecuritySystem((prev) => `${prev}\n\nUser response appended: ${text}`); // Fixed to setSecuritySystem
+            }
         };
-        // Format chat history for API request
+
         history = history.map(({ role, text }) => ({ role, parts: [{ text }] }));
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ contents: history }),
         };
+
         try {
-            // Make the API call to get the bot's response
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, requestOptions);
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+                requestOptions
+            );
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error.message || "Something went wrong!");
-            // Clean and update chat history with bot's response
             const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
             updateHistory(apiResponseText);
         } catch (error) {
-            // Update chat history with the error message
             updateHistory(error.message, true);
         }
     };
+
     useEffect(() => {
-        // Auto-scroll whenever chat history updates
         chatBodyRef.current.scrollTo({ top: chatBodyRef.current.scrollHeight, behavior: "smooth" });
     }, [chatHistory]);
+
+    useEffect(() => {
+        setChatHistory((prev) =>
+            prev.map((msg) =>
+                msg.hideInChat ? { ...msg, text: securitySystem } : msg
+            )
+        );
+    }, [securitySystem]);
+
     return (
         <div className={`container ${showChatbot ? "show-chatbot" : ""}`}>
             <button onClick={() => setShowChatbot((prev) => !prev)} id="chatbot-toggler">
@@ -51,7 +69,6 @@ const Chatbot = () => {
                 <span className="material-symbols-rounded">close</span>
             </button>
             <div className="chatbot-popup">
-                {/* Chatbot Header */}
                 <div className="chat-header">
                     <div className="header-info">
                         <ChatbotIcon />
@@ -61,20 +78,17 @@ const Chatbot = () => {
                         keyboard_arrow_down
                     </button>
                 </div>
-                {/* Chatbot Body */}
                 <div ref={chatBodyRef} className="chat-body">
                     <div className="message bot-message">
                         <ChatbotIcon />
                         <p className="message-text">
-                            Hey there  <br /> How can I help you today?
+                            Hey there <br /> How can I help you today?
                         </p>
                     </div>
-                    {/* Render the chat history dynamically */}
                     {chatHistory.map((chat, index) => (
                         <ChatMessage key={index} chat={chat} />
                     ))}
                 </div>
-                {/* Chatbot Footer */}
                 <div className="chat-footer">
                     <ChatForm chatHistory={chatHistory} setChatHistory={setChatHistory} generateBotResponse={generateBotResponse} />
                 </div>
@@ -82,4 +96,5 @@ const Chatbot = () => {
         </div>
     );
 };
+
 export default Chatbot;
