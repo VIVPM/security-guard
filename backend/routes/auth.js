@@ -147,8 +147,8 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Construct reset URL (adjust FRONTEND_URL as needed)
-    // const resetUrl = `https://security-guard-jsj0.onrender.com/reset-password/${resetToken}`;
-    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetUrl = `https://security-guard-jsj0.onrender.com/reset-password/${resetToken}`;
+    // const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
     // Send email with reset link
     const mailOptions = {
