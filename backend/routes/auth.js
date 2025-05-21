@@ -34,10 +34,11 @@ router.post('/register', upload.single('profilePicture'), async (req, res) => {
 
   let personalInfoObj;
   try {
-    personalInfoObj = JSON.parse(personalInfo);
+    personalInfoObj = typeof personalInfo === 'string' ? JSON.parse(personalInfo) : personalInfo;
   } catch (err) {
     return res.status(400).json({ message: 'Invalid personalInfo format' });
   }
+
 
   try {
     // Check if user already exists by personalInfo.email
@@ -76,7 +77,11 @@ router.post('/register', upload.single('profilePicture'), async (req, res) => {
       personalInfo: personalInfoObj,
       workExperience: workExperience ? JSON.parse(workExperience) : [],
       certifications: certifications ? JSON.parse(certifications) : [],
-      trainingAndSkills: trainingAndSkills ? JSON.parse(trainingAndSkills) : [],
+      trainingAndSkills: trainingAndSkills
+        ? typeof trainingAndSkills === 'string'
+          ? JSON.parse(trainingAndSkills)
+          : trainingAndSkills
+        : { trainings: [], skills: [] },
       emergencyContact: emergencyContact ? JSON.parse(emergencyContact) : {},
       backgroundCheck: {}
     });
@@ -142,7 +147,8 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Construct reset URL (adjust FRONTEND_URL as needed)
-    const resetUrl = `https://security-guard-jsj0.onrender.com/reset-password/${resetToken}`;
+    // const resetUrl = `https://security-guard-jsj0.onrender.com/reset-password/${resetToken}`;
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
     // Send email with reset link
     const mailOptions = {
