@@ -1,70 +1,236 @@
-# Getting Started with Create React App
+# 🛡️ Security Guard Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web application to manage security guard operations — including attendance tracking, incident reporting, location monitoring, shift scheduling, and real-time notifications — with separate dashboards for **Admins** and **Guards**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🏗️ Architecture
 
-### `npm start`
+```mermaid
+graph TB
+    subgraph Frontend["Frontend (React)"]
+        Login["Login / Register"]
+        subgraph AdminViews["Admin Views"]
+            AdminDash["Admin Dashboard"]
+            AddPlace["Add / Manage Places"]
+            AdminAttendance["Attendance Overview"]
+            IncidentAdmin["Incident Dashboard"]
+            GuardMap["Guard Location Map"]
+            Reports["Reports (PDF Export)"]
+        end
+        subgraph GuardViews["Guard Views"]
+            GuardDash["Guard Dashboard"]
+            AttendanceDash["Attendance Dashboard"]
+            IncidentGuard["Incident Reporting"]
+        end
+        Chatbot["AI Chatbot"]
+    end
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    subgraph Backend["Backend (Node.js + Express)"]
+        AuthAPI["/apiAuth — Authentication"]
+        ProfileAPI["/apiProfile — Profile"]
+        AdminAPI["/admin — Admin Controls"]
+        PlacesAPI["/apiPlaces — Places"]
+        IncidentsAPI["/apiIncidents — Incidents"]
+        AttendanceAPI["/apiAttendance — Attendance"]
+        ReportsAPI["/apiReports — Reports"]
+        NotificationsAPI["/apiNotifications — Notifications"]
+        Scheduler["Scheduler (node-cron)"]
+    end
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    subgraph Services["External Services"]
+        MongoDB[("MongoDB\n(Mongoose)")]
+        Firebase["Firebase\n(Push Notifications)"]
+        Cloudinary["Cloudinary\n(Image Upload)"]
+        Email["Nodemailer\n(Email Alerts)"]
+        SocketIO["Socket.io\n(Real-time)"]
+        PDF["PDF Generation\n(pdfkit / html-pdf)"]
+    end
 
-### `npm test`
+    Frontend -->|JWT + REST| Backend
+    AuthAPI --> MongoDB
+    ProfileAPI --> MongoDB
+    ProfileAPI --> Cloudinary
+    AdminAPI --> MongoDB
+    PlacesAPI --> MongoDB
+    IncidentsAPI --> MongoDB
+    IncidentsAPI --> Cloudinary
+    AttendanceAPI --> MongoDB
+    ReportsAPI --> MongoDB
+    ReportsAPI --> PDF
+    NotificationsAPI --> Firebase
+    NotificationsAPI --> Email
+    Scheduler --> AttendanceAPI
+    Backend --> SocketIO --> Frontend
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## ✨ Features
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🛡️ Guard Features
+- **Guard Dashboard** — View assigned shifts, schedule, and location check-ins
+- **Attendance Tracking** — Clock-in/out with location verification
+- **Incident Reporting** — Log incidents with description, photo upload (Cloudinary), and severity
+- **AI Chatbot** — In-app chatbot for quick queries about duties and procedures
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🔧 Admin Features
+- **Admin Dashboard** — Full overview of guards, places, attendance, and incidents
+- **Place Management** — Add and configure guard posts/locations with geo-data
+- **Attendance Overview** — Monitor all guards' attendance records; export reports
+- **Incident Dashboard** — Review, manage, and respond to all reported incidents
+- **Guard Location Map** — Live map view of guard locations
+- **Report Generation** — Generate and download PDF reports
+- **Push Notifications** — Send Firebase push notifications and email alerts to guards
+- **Scheduled Jobs** — Automated attendance reminders via `node-cron`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🔐 Authentication & Security
+- JWT-based authentication (`jsonwebtoken`)
+- Password hashing with `bcrypt`
+- Passport.js middleware (local & JWT strategies)
+- Role-based access: **Admin** vs **Guard**
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🛠️ Tech Stack
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Frontend
+| Tool | Purpose |
+|---|---|
+| React (CRA) | UI framework |
+| React Router | Client-side routing |
+| Axios | HTTP API calls |
+| Socket.io Client | Real-time updates |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Backend
+| Tool | Purpose |
+|---|---|
+| Node.js + Express | REST API server |
+| Mongoose + MongoDB | Database ORM + storage |
+| Firebase Admin | Push notifications |
+| Cloudinary | Image upload & storage |
+| Nodemailer | Email alerts |
+| Socket.io | Real-time communication |
+| jsonwebtoken + Passport | Auth & authorization |
+| node-cron | Scheduled tasks |
+| pdfkit / html-pdf | PDF report generation |
+| multer | File upload handling |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 📁 Project Structure
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+security-guard/
+├── backend/
+│   ├── models/
+│   │   ├── User.js          # Guard/Admin user model
+│   │   ├── Attendance.js    # Attendance records
+│   │   ├── Incident.js      # Incident reports
+│   │   ├── Notification.js  # Notification records
+│   │   ├── Place.js         # Guard post/location model
+│   │   └── location.js      # Live location tracking
+│   ├── routes/
+│   │   ├── auth.js          # Login, register, JWT
+│   │   ├── profile.js       # Profile update, photo upload
+│   │   ├── admin.js         # Admin controls
+│   │   ├── places.js        # Place CRUD
+│   │   ├── incidents.js     # Incident CRUD + photo
+│   │   ├── attendances.js   # Check-in/out, attendance logs
+│   │   ├── reports.js       # PDF report generation
+│   │   ├── notifications.js # Firebase + email alerts
+│   │   ├── scheduler.js     # Cron jobs
+│   │   └── locations.js     # Live location updates
+│   ├── middleware/          # Auth middleware (JWT verify)
+│   └── server.js            # Express app entry point
+├── frontend/
+│   └── src/
+│       ├── Admin/
+│       │   ├── AdminDashboard.js
+│       │   ├── AdminAttendance.js
+│       │   ├── AdminIncidentDashboard.js
+│       │   ├── AddPlacePage.js
+│       │   ├── GuardLocationMap.js
+│       │   └── Report.js
+│       ├── Guard/
+│       │   ├── GuardDashboard.js
+│       │   ├── AttendanceDashboard.js
+│       │   └── IncidentDashboard.js
+│       ├── Chatbot/
+│       │   ├── Chatbot.jsx
+│       │   └── securitySystem.js
+│       ├── components/      # Shared UI components
+│       └── App.js           # Routes & role-based rendering
+└── README.md
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🚀 Getting Started
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Prerequisites
+- [Node.js](https://nodejs.org/) v16+
+- [MongoDB](https://www.mongodb.com/) (local or Atlas)
+- [Yarn](https://yarnpkg.com/)
 
-### Analyzing the Bundle Size
+### Backend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+cd backend
+yarn install
+```
 
-### Making a Progressive Web App
+Create a `.env` file in `backend/`:
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_email_password
+FIREBASE_SERVICE_ACCOUNT=path_to_firebase_service_account.json
+PORT=5000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Run the server:
+```bash
+# Development
+yarn dev
 
-### Advanced Configuration
+# Production
+yarn start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+API runs at: `http://localhost:5000`
 
-### Deployment
+### Frontend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+cd frontend
+yarn install
+yarn start
+```
 
-### `npm run build` fails to minify
+App runs at: `http://localhost:3000`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 🔌 API Endpoints Overview
+
+| Route Prefix | Description |
+|---|---|
+| `/apiAuth` | Login, register, token management |
+| `/apiProfile` | View & update guard/admin profile, photo upload |
+| `/admin` | Admin-only user and system management |
+| `/apiPlaces` | Create, update, delete guard posts |
+| `/apiIncidents` | Report and manage security incidents |
+| `/apiAttendance` | Clock-in/out, attendance history |
+| `/apiReports` | Generate and download PDF reports |
+| `/apiNotifications` | Send push + email notifications |
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE)
