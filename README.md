@@ -40,7 +40,6 @@ graph TB
 
     subgraph Services["External Services"]
         MongoDB[("MongoDB\n(Mongoose)")]
-        Firebase["Firebase\n(Push Notifications)"]
         Cloudinary["Cloudinary\n(Image Upload)"]
         Email["Nodemailer\n(Email Alerts)"]
         SocketIO["Socket.io\n(Real-time)"]
@@ -58,8 +57,8 @@ graph TB
     AttendanceAPI --> MongoDB
     ReportsAPI --> MongoDB
     ReportsAPI --> PDF
-    NotificationsAPI --> Firebase
     NotificationsAPI --> Email
+    NotificationsAPI --> MongoDB
     Scheduler --> AttendanceAPI
     Backend --> SocketIO --> Frontend
 ```
@@ -81,7 +80,7 @@ graph TB
 - **Incident Dashboard** — Review, manage, and respond to all reported incidents
 - **Guard Location Map** — Live map view of guard locations
 - **Report Generation** — Generate and download PDF reports
-- **Push Notifications** — Send Firebase push notifications and email alerts to guards
+- **Push Notifications** — In-app notifications stored in MongoDB
 - **Scheduled Jobs** — Automated attendance reminders via `node-cron`
 
 ### 🔐 Authentication & Security
@@ -107,7 +106,6 @@ graph TB
 |---|---|
 | Node.js + Express | REST API server |
 | Mongoose + MongoDB | Database ORM + storage |
-| Firebase Admin | Push notifications |
 | Cloudinary | Image upload & storage |
 | Nodemailer | Email alerts |
 | Socket.io | Real-time communication |
