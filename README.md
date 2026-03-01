@@ -187,7 +187,7 @@ CLOUDINARY_API_KEY=your_cloudinary_key
 CLOUDINARY_API_SECRET=your_cloudinary_secret
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_email_password
-FIREBASE_SERVICE_ACCOUNT=path_to_firebase_service_account.json
+
 PORT=5000
 ```
 

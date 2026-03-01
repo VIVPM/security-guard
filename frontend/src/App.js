@@ -14,8 +14,8 @@ import Contact from './components/Contact';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import AdminIncidentDashboard from './Admin/AdminIncidentDashboard';
 import IncidentDashboard from './Guard/IncidentDashboard';
-import Chatbot from "./Chatbot/Chatbot";
-import NotificationsPage from './components/NotificationsPage'; 
+
+import NotificationsPage from './components/NotificationsPage';
 import Report from './Admin/Report';
 import AttendanceDashboard from './Guard/AttendanceDashboard';
 import AdminAttendance from './Admin/AdminAttendance';
@@ -23,10 +23,10 @@ import 'leaflet/dist/leaflet.css';
 
 function App() {
   return (
-    
+
     <AuthProvider>
       <Router>
-        <Chatbot />
+
         <Navbar />
         <Switch>
           <Route exact path="/" component={LandingPage} />
@@ -35,8 +35,8 @@ function App() {
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/add-place" component={AddPlacePage} />
           <Route path="/register" component={RegisterPage} />
-          <Route path="/guard-dashboard" component={GuardDashboard}/>
-          <Route path="/contact" component={Contact}/>
+          <Route path="/guard-dashboard" component={GuardDashboard} />
+          <Route path="/contact" component={Contact} />
           <Route path="/reset-password/:token" component={ResetPasswordPage} />
           <Route path="/incident-dashboard" component={IncidentDashboard} />
           <Route path="/admin-incident-dashboard" component={AdminIncidentDashboard} />
@@ -48,7 +48,7 @@ function App() {
         </Switch>
       </Router>
     </AuthProvider>
-  
+
   );
 }
 
