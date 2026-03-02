@@ -1,11 +1,11 @@
-// export const server = "http://localhost:5000";
-export const server = "https://security-guard-jsj0.onrender.com";
+export const server = "http://localhost:5000";
+// export const server = "https://security-guard-jsj0.onrender.com";
 const apiList = {
     login: `${server}/apiAuth/login`,
     signup: `${server}/apiAuth/register`,
-    forgotPassword:`${server}/apiAuth/forgot-password`,
+    forgotPassword: `${server}/apiAuth/forgot-password`,
     resetPassword: `${server}/apiAuth/reset-password`,
-    getProfile:`${server}/apiProfile/profile`,
+    getProfile: `${server}/apiProfile/profile`,
     putProfile: `${server}/apiProfile/profile`,
     assignedPlaces: `${server}/apiProfile/guard`,
     postGuards: `${server}/admin/guards`,

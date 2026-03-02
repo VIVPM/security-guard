@@ -20,7 +20,7 @@ require('./routes/scheduler');
 
 const app = express();
 const port = process.env.PORT || 5000;
-app.use(express.static(path.join(__dirname, "build")));
+// app.use(express.static(path.join(__dirname, "build")));
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json()); // support json encoded bodies
@@ -44,14 +44,14 @@ app.use('/admin', adminRoutes);
 app.use('/apiPlaces', placeRoutes);
 app.use('/apiIncidents', incidentRoutes);
 app.use('/apiNotifications', notificationRoutes);
-app.use('/apiReports',reportRouter);
-app.use('/apiAttendance',attendanceRouter);
+app.use('/apiReports', reportRouter);
+app.use('/apiAttendance', attendanceRouter);
 
-app.get("*", (req, res) => {
-    // if (req.originalUrl.startsWith("/apiAuth") || req.originalUrl.startsWith("/apiProfile") || req.originalUrl.startsWith("/admin") || req.originalUrl.startsWith("/apiPlaces") || req.originalUrl.startsWith("/apiNotifications") || req.originalUrl.startsWith("/apiReports") || req.originalUrl.startsWith("/apiAttendance")) {
-    //     return res.status(404).json({ message: "API route not found" });
-    // }
-    res.sendFile(path.join(__dirname, "build", "index.html"));
-});
+// app.get("*", (req, res) => {
+//     // if (req.originalUrl.startsWith("/apiAuth") || req.originalUrl.startsWith("/apiProfile") || req.originalUrl.startsWith("/admin") || req.originalUrl.startsWith("/apiPlaces") || req.originalUrl.startsWith("/apiNotifications") || req.originalUrl.startsWith("/apiReports") || req.originalUrl.startsWith("/apiAttendance")) {
+//     //     return res.status(404).json({ message: "API route not found" });
+//     // }
+//     res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
